@@ -1,5 +1,6 @@
 from savitrigen.tree import TreeClass
 from savitrigen.frontendconfig import FrontendConfig
+import os
 
 @TreeClass('frontend')
 class FrontendTree():
@@ -22,4 +23,4 @@ class FrontendTree():
             }
         })
 
-        self.path.write_file('packages/frontend/build.json', content)
+        self.write_file('build.json', content)

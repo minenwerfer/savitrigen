@@ -12,9 +12,17 @@ def TreeClass(layer:str, scope:str=None):
 
 class Tree(object):
     path = PathlibWrapper()
+    parent_dir: str
 
-    def __init__(self, *args, **kwargs):
-        pass
+    def __getattr__(self, attr):
+        def wrapped_method(*args, **kwargs):
+            if hasattr(self.path, attr):
+                if not self.path.parent_dir:
+                    self.path.parent_dir = 'packages/{}'.format(self.layer)
+
+                path = '{}/{}'.format(self.path.parent_dir, args[0])
+                return getattr(self.path, attr)(path, *args[1:], **kwargs)
+        return wrapped_method
 
     @staticmethod
     def json_dumps(what:object) -> str:
