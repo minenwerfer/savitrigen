@@ -1,0 +1,78 @@
+from functools import reduce
+
+ts_type_mapping = {
+    'string': [
+        'text',
+        'string',
+        'select',
+        'checkbox',
+        'readio'
+    ],
+    'number': [
+        'number',
+        'integer'
+    ],
+    'ObjectId': [
+        'module',
+        'objectid'
+    ],
+    'boolean': 'boolean',
+    'DateTime': 'datetime',
+    'any': 'object',
+}
+
+def extract_module(field:dict) -> str:
+    def extract_query(value:dict) -> dict:
+        return value.get('__query', None)
+
+    is_array = field.get('array', False)
+
+    if 'module' in field:
+        return field['module'], is_array
+
+    if 'values' in field:
+        if query := extract_query(
+            field['values']
+            if not isinstance(field['values'], list)
+            else field['values'][0]
+        ):
+            return (
+                query['module'],
+                is_array or isinstance(field['values'], list)
+            )
+
+def extract_modules(fields:dict) -> str:
+    for k, v in fields.items():
+        _tuple = extract_module(v)
+        if _tuple:
+            yield _tuple
+
+def convert_type(name:str) -> dict:
+    return next((
+        k
+        for k, v in ts_type_mapping.items()
+        if name in v
+    ), None)
+
+def map_fields(fields:dict) -> dict:
+    def reducer(a:dict, item:tuple) -> dict:
+        k, v = item
+        field_type = v.get('type', 'text')
+
+        _tuple = extract_module(v)
+        if _tuple:
+            module, is_array = _tuple
+            return a | { k: '{}Document{}'.format(
+                module[0].upper() + module[1:],
+                '[]' if is_array else ''
+            ) }
+
+        return a | { k: convert_type(field_type) }
+    return reduce(reducer, fields.items(), {})
+
+def make_ts_typehints(obj:dict) -> str:
+    def reducer(a:str, item:tuple) -> list:
+        k, v = item
+        return a + ["  {}: {}".format(k, v)]
+    return "\n".join(reduce(reducer, obj.items(), []))
+

@@ -1,5 +1,5 @@
 from savitrigen.tree import TreeClass
-from savitrigen.frontendconfig import FrontendConfig
+from savitrigen.config import FrontendConfig
 import os
 
 @TreeClass('frontend')
@@ -8,7 +8,7 @@ class FrontendTree():
         self._config = config
 
     def create_build_json(self):
-        content = self.json_dumps({
+        content = self._json_dumps({
             'name': '',
             'externals': {
                 'variables': {

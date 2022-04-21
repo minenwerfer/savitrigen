@@ -25,5 +25,14 @@ class Tree(object):
         return wrapped_method
 
     @staticmethod
-    def json_dumps(what:object) -> str:
-        return json.dumps(what, indent=4)
+    def _json_dumps(what:object) -> str:
+        return json.dumps(what, indent=2, ensure_ascii=False)
+
+    @staticmethod
+    def _pascal_case(string:str) -> str:
+        return string[0].upper() + string[1:]
+
+    @staticmethod
+    def _camel_case(string:str) -> str:
+        return string[0].lower() + string[1:]
+

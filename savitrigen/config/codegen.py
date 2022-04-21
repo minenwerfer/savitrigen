@@ -1,5 +1,5 @@
 from dataclasses import dataclass
 
 @dataclass
-class Config(object):
+class CodegenConfig(object):
     boilerplate_repo_url:str
