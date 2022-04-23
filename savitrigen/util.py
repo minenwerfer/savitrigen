@@ -27,12 +27,12 @@ def extract_module(field:dict) -> str:
 
     is_array = field.get('array', False)
 
-    if 'module' in field:
-        return field['module'], is_array
+    if module := field.get('module'):
+        return module, is_array
 
-    if 'values' in field:
+    if values := field.get('values'):
         if query := extract_query(
-            field['values']
+            values
             if not isinstance(field['values'], list)
             else field['values'][0]
         ):

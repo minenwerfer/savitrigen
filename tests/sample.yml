@@ -1,49 +1,50 @@
-modules:
-  pizza:
-    documentation: >
-      Pizzas disponíveis no cardápio do estabelecimento.
-      O usuário cadastra o nome da pizza e os ingredientes e o preço é automaticamente calculado.
-    translation:
-      pt_BR: pizza | pizzas
+backend:
+  modules:
+    pizza:
+      documentation: >
+        Pizzas disponíveis no cardápio do estabelecimento.
+        O usuário cadastra o nome da pizza e os ingredientes e o preço é automaticamente calculado.
+      translation:
+        pt_BR: pizza | pizzas
 
-    unicon: pizza-slice
-    route: true
-    report: true
-    presets:
-      - crud
-    fields:
-      name:
-        label: Nome
-        type: text
-      ingredients:
-        label: Ingredientes
-        type: checkbox
-        required: true
-        values:
-          - __query:
-              module: ingredient
-              index:
-                - name
-                - price
-      price_small:
-        label: Preço (S)
-        type: number
-        readonly: true
+      unicon: pizza-slice
+      route: true
+      report: true
+      presets:
+        - crud
+      fields:
+        name:
+          label: Nome
+          type: text
+        ingredients:
+          label: Ingredientes
+          type: checkbox
+          required: true
+          values:
+            - __query:
+                module: ingredient
+                index:
+                  - name
+                  - price
+        price_small:
+          label: Preço (S)
+          type: number
+          readonly: true
 
-  ingredient:
-    translation:
-      pt_BR: ingrediente | ingredients
+    ingredient:
+      translation:
+        pt_BR: ingrediente | ingredients
 
-    unicon: chart-pie-alt
-    route: true
-    presets:
-      - crud
-    fields:
-      name:
-        label: Nome
-        type: text
-      price:
-        label: Custo de fabricação
-        description: Usando pizza gigante como referência
-        type: number
+      unicon: chart-pie-alt
+      route: true
+      presets:
+        - crud
+      fields:
+        name:
+          label: Nome
+          type: text
+        price:
+          label: Custo de fabricação
+          description: Usando pizza gigante como referência
+          type: number
 

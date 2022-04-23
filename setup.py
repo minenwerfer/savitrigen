@@ -8,7 +8,7 @@ setup(
     version=version,
     description='Savitri code generator',
     author='João Santos',
-    license='GPL',
+    license='ISC',
     packages=find_packages(),
     entry_points={
         'console_scripts': [

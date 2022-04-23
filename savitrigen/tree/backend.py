@@ -3,7 +3,12 @@ from string import Template
 from savitrigen.tree import TreeClass
 from savitrigen.config import BackendConfig
 from savitrigen.util import map_fields, make_ts_typehints, extract_modules
-from savitrigen.template.backend import ControllerTemplate, ModelTemplate
+from savitrigen.template.backend import (
+    ControllerTemplate,
+    ModelTemplate,
+    DocumentImportTemplate,
+    ReferenceImportTemplate
+)
 
 @TreeClass('backend')
 class BackendTree():
@@ -17,24 +22,20 @@ class BackendTree():
     def _document_imports(self, modules:list) -> str:
         def reducer(a:str, _tuple:tuple) -> str:
             name, _ = _tuple
-            tpl = Template(r"import { ${pascal_case}Document } from '../${camel_case}/${camel_case}.model'")
-            return a + [tpl.substitute(
+            return a + [DocumentImportTemplate.substitute(
                 pascal_case=self._pascal_case(name),
                 camel_case=self._camel_case(name)
             )]
 
         return "\n".join(reduce(reducer, modules, []))\
-            if len(modules) > 0 else '// no document imports'
 
     def _reference_imports(self, modules:list) -> str:
         def reducer(a:str, _tuple:tuple) -> str:
             name, _ = _tuple
-            tpl = Template(r"import '../${camel_case}/${camel_case}.model'")
-            return a + [tpl.substitute(
+            return a + [ReferenceImportTemplate.substitute(
                 camel_case=self._camel_case(name)
             )]
         return "\n".join(reduce(reducer, modules, [])) \
-            if len(modules) > 0 else '// no reference imports'
 
     def create(self):
         for k, v in self._config.modules.items():
@@ -54,11 +55,10 @@ class BackendTree():
 
         Will also add a description to the controller file that may contain JSDoc symbols.
         """
-        path = 'modules/{}'.format(name)
-        self.make_dir(path)
+        path = self.make_dir('modules/{}'.format(name))
 
-        description = dict(module=name) | _description
-        documentation = description.get('documentation', 'undocumented').strip()
+        description = dict(module=name) | _description.__dict__
+        documentation = description.get('documentation').strip()
 
         fields = description.get('fields')
         mapped_fields = map_fields(fields)
@@ -69,17 +69,24 @@ class BackendTree():
             if k in description:
                 del description[k]
 
-        params = dict(
-            pascal_case=self._pascal_case(name),
-            camel_case=self._camel_case(name),
-            documentation=documentation,
-            type_hints=make_ts_typehints(mapped_fields),
-            document_imports=self._document_imports(modules),
-            reference_imports=self._reference_imports(modules),
-        )
+        params = {
+            'pascal_case': self._pascal_case(name),
+            'camel_case': self._camel_case(name),
+            'documentation': documentation,
+            'type_hints': make_ts_typehints(mapped_fields),
+            **({
+                'document_imports': self._document_imports(modules),
+                'reference_imports': self._reference_imports(modules),
+
+            } if len(modules) > 0 else {})
+        }
 
         controller_content = ControllerTemplate.substitute(**params)
-        model_content = ModelTemplate.safe_substitute(**params)
+
+        model_content = ModelTemplate.substitute({
+            'document_imports': '// no document imports',
+            'reference_imports': '// no reference imports',
+        }, **params)
 
         with self.change_dir(path):
             self.write_file('index.json', self._json_dumps(description))

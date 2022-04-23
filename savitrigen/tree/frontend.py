@@ -1,6 +1,10 @@
 from savitrigen.tree import TreeClass
 from savitrigen.config import FrontendConfig
-import os
+from savitrigen.template.frontend import (
+    IndexTemplate,
+    RouterTemplate,
+    StoreTemplate
+)
 
 @TreeClass('frontend')
 class FrontendTree():
@@ -24,3 +28,19 @@ class FrontendTree():
         })
 
         self.write_file('build.json', content)
+
+
+    def create_module(self, name:str):
+        path = self.make_dir('modules/{}'.format(name))
+
+        store_path = self.make_dir('modules/{}/store'.format(name))
+        components_path = self.make_dir('modules/{}/components'.format(name))
+
+        index_content = IndexTemplate.substitute()
+        router_content = RouterTemplate.substitute()
+        store_content = StoreTemplate.substitute()
+
+        with self.change_dir(path):
+            self.write_file('index.ts', index_content)
+            self.write_file('router.ts', router_content)
+            self.write_file('store/index.ts', store_content)

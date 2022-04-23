@@ -32,3 +32,7 @@ ${type_hints}
 export const ${pascal_case}Schema = descriptionToSchema<${pascal_case}Document>(Description, options)
 export const ${pascal_case} = mongoose.model<${pascal_case}Document>('${pascal_case}', ${pascal_case}Schema)
 """)
+
+DocumentImportTemplate = Template(r"import { ${pascal_case}Document } from '../${camel_case}/${camel_case}.model'")
+
+ReferenceImportTemplate = Template(r"import '../${camel_case}/${camel_case}.model'")

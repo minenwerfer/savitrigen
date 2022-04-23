@@ -16,6 +16,7 @@ class PathlibWrapper(object):
     def change_dir(self, new_dir:str):
         previous_dir = self.parent_dir
         self.parent_dir = new_dir
+
         try:
             yield
         finally:

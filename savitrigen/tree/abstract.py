@@ -1,4 +1,5 @@
 import json
+import pathlib
 from savitrigen.path import PathlibWrapper
 
 def TreeClass(layer:str, scope:str=None):
@@ -18,9 +19,15 @@ class Tree(object):
         def wrapped_method(*args, **kwargs):
             if hasattr(self.path, attr):
                 if not self.path.parent_dir:
-                    self.path.parent_dir = 'packages/{}'.format(self.layer)
+                    self.path.parent_dir = 'packages/{}{}'.format(
+                        f'{self.scope}-' if self.scope else '',
+                        self.layer
+                    )
 
-                path = '{}/{}'.format(self.path.parent_dir, args[0])
+                path = '{}/{}'.format(self.path.parent_dir, args[0]) \
+                    if not isinstance(args[0], pathlib.Path) \
+                    else args[0]
+
                 return getattr(self.path, attr)(path, *args[1:], **kwargs)
         return wrapped_method
 
