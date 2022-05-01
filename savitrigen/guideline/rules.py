@@ -11,14 +11,6 @@ FIELD_NAMING = [
     (lambda name: re.match(r'[A-Z]', name), 'field name must use snake_case'),
 ]
 
-def check(test, message, subject) -> None:
-    if test(subject):
-        raise TypeError('{}: {}'.format(message, subject))
-
-def check_module_naming(name:str) -> None:
-    for t in MODULE_NAMING:
-        check(*t, name)
-
-def check_field_naming(name:str) -> None:
-    for t in FIELD_NAMING:
-        check(*t, name)
+PLUGIN_NAMING = [
+    (lambda name: not re.match(r'plugin-[a-z]+$', name), 'module must follow "plugin-name" format')
+]
