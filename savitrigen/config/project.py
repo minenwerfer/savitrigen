@@ -1,5 +1,9 @@
 from dataclasses import dataclass
+from .backend import BackendConfig
 
 @dataclass
 class ProjectConfig(object):
-    backend:dict
+    meta:dict
+
+    plugins:list[str]
+    backend:BackendConfig

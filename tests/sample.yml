@@ -1,5 +1,13 @@
+meta:
+  product:
+    name: Pizzaria Savitri
+
+plugins:
+  - '@savitri/plugin-referral'
+  - '@savitri/plugin-videoroom'
+
 backend:
-  modules:
+  entities:
     pizza:
       documentation: >
         Pizzas disponíveis no cardápio do estabelecimento.

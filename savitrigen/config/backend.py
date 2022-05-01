@@ -31,15 +31,17 @@ class Field(object):
 
 @dataclass
 class BackendConfig(object):
-    modules:dict
-    _modules:dict = field(init=False, repr=False)
+    entities:dict
+    _entities:dict = field(init=False, repr=False)
+
+    plugins:list[str] = None
 
     @property
-    def modules(self) -> dict:
-        return self._modules
+    def entities(self) -> dict:
+        return self._entities
 
-    @modules.setter
-    def modules(self, value:dict) -> None:
+    @entities.setter
+    def entities(self, value:dict) -> None:
         ms = dict()
 
         for k, v in value.items():
@@ -50,4 +52,4 @@ class BackendConfig(object):
                 module.fields[f_k] = Field(**f_v).__dict__
                 check_field_naming(f_k)
 
-        self._modules = ms
+        self._entities = ms

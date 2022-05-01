@@ -1,5 +1,7 @@
 import json
 import pathlib
+from functools import reduce
+from string import Template
 from savitrigen.path import PathlibWrapper
 
 def TreeClass(layer:str, scope:str=None):
@@ -32,8 +34,20 @@ class Tree(object):
         return wrapped_method
 
     @staticmethod
+    def _multiline_replace(subjects:list, template:Template, func) -> str:
+        def reducer(a:str, item) -> str:
+            result = func(item)
+            return a + [template.substitute(**result)]
+
+        return "\n".join(reduce(reducer, subjects, []))\
+
+    @staticmethod
     def _json_dumps(what:object) -> str:
         return json.dumps(what, indent=2, ensure_ascii=False)
+
+    @staticmethod
+    def _capitalize(string:str) -> str:
+        return string[0].upper() + string[1:]
 
     @staticmethod
     def _pascal_case(string:str) -> str:
@@ -42,4 +56,3 @@ class Tree(object):
     @staticmethod
     def _camel_case(string:str) -> str:
         return string[0].lower() + string[1:]
-

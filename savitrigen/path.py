@@ -1,6 +1,9 @@
 import pathlib
 import contextlib
 import logging
+import typing
+from string import Template
+from multipledispatch import dispatch
 
 class PathlibWrapper(object):
     def __init__(self):
@@ -28,8 +31,20 @@ class PathlibWrapper(object):
         path.mkdir(parents=True)
         return path
 
-    def write_file(self, fname:str, content:str) -> pathlib.Path:
+    def _write_file(self, fname:str, content:str) -> pathlib.Path:
         self.logger.info('WRITE %s', fname)
         path = self._get_path(fname)
         path.write_bytes(content.encode())
         return path
+
+    @dispatch(str, str)
+    def write_file(self, *args, **kwargs) -> pathlib.Path:
+        return self._write_file(*args, **kwargs)
+
+    @dispatch(str, Template, dict)
+    def write_file(self, fname:str, template:Template, replacements:dict) -> pathlib.Path:
+        return self._write_file(fname, template.substitute(**replacements))
+
+    @dispatch(str, Template, dict, dict)
+    def write_file(self, fname:str, template:Template, fallback:dict, replacements:dict) -> pathlib.Path:
+        return self._write_file(fname, template.substitute(fallback, **replacements))

@@ -1,5 +1,3 @@
-from functools import reduce
-from string import Template
 from savitrigen.tree import TreeClass
 from savitrigen.config import BackendConfig
 from savitrigen.util import map_fields, make_ts_typehints, extract_modules
@@ -7,7 +5,10 @@ from savitrigen.template.backend import (
     ControllerTemplate,
     ModelTemplate,
     DocumentImportTemplate,
-    ReferenceImportTemplate
+    ReferenceImportTemplate,
+    IndexTemplate,
+    PluginImportTemplate,
+    PluginInstanceTemplate
 )
 
 @TreeClass('backend')
@@ -19,26 +20,26 @@ class BackendTree():
             'documentation'
         ]
 
-    def _document_imports(self, modules:list) -> str:
-        def reducer(a:str, _tuple:tuple) -> str:
-            name, _ = _tuple
-            return a + [DocumentImportTemplate.substitute(
-                pascal_case=self._pascal_case(name),
-                camel_case=self._camel_case(name)
-            )]
-
-        return "\n".join(reduce(reducer, modules, []))\
-
-    def _reference_imports(self, modules:list) -> str:
-        def reducer(a:str, _tuple:tuple) -> str:
-            name, _ = _tuple
-            return a + [ReferenceImportTemplate.substitute(
-                camel_case=self._camel_case(name)
-            )]
-        return "\n".join(reduce(reducer, modules, [])) \
-
     def create(self):
-        for k, v in self._config.modules.items():
+        self.write_file('index.ts', IndexTemplate, {
+            'module_imports': self._multiline_replace(
+                self._config.plugins,
+                PluginImportTemplate,
+                lambda _ : {
+                    'capitalized': self._capitalize(_.split('-')[-1]),
+                    'plugin_module': _
+                },
+            ),
+            'module_instances': self._multiline_replace(
+                self._config.plugins,
+                PluginInstanceTemplate,
+                lambda _ : {
+                    'capitalized': ' '*4 + self._capitalize(_.split('-')[-1])
+                }
+            )
+        })
+
+        for k, v in self._config.entities.items():
             self.create_module(k, v)
 
     def create_build_json(self):
@@ -46,7 +47,7 @@ class BackendTree():
         self.write_file('build.json', content)
 
     def create_module(self, name:str, _description:dict):
-        """Creates modules
+        """Creates entities
 
         Each module is supposed to contain 3 files:
             - index.json
@@ -55,7 +56,7 @@ class BackendTree():
 
         Will also add a description to the controller file that may contain JSDoc symbols.
         """
-        path = self.make_dir('modules/{}'.format(name))
+        path = self.make_dir('entities/{}'.format(name))
 
         description = dict(module=name) | _description.__dict__
         documentation = description.get('documentation').strip()
@@ -63,7 +64,8 @@ class BackendTree():
         fields = description.get('fields')
         mapped_fields = map_fields(fields)
 
-        modules = list(extract_modules(fields))
+        entities = list(extract_modules(fields))
+        entities_names = [ entity[0] for entity in entities ]
 
         for k in self._unused_keys:
             if k in description:
@@ -75,22 +77,32 @@ class BackendTree():
             'documentation': documentation,
             'type_hints': make_ts_typehints(mapped_fields),
             **({
-                'document_imports': self._document_imports(modules),
-                'reference_imports': self._reference_imports(modules),
+                'document_imports': self._multiline_replace(
+                    entities_names,
+                    DocumentImportTemplate,
+                    lambda _ : {
+                        'pascal_case': self._pascal_case(_),
+                        'camel_case': self._camel_case(_)
+                    }
+                ),
+                'reference_imports': self._multiline_replace(
+                    entities_names,
+                    ReferenceImportTemplate,
+                    lambda _ : {
+                        'camel_case': self._camel_case(_),
+                    }
+                ),
 
-            } if len(modules) > 0 else {})
+            } if len(entities) > 0 else {})
         }
-
-        controller_content = ControllerTemplate.substitute(**params)
-
-        model_content = ModelTemplate.substitute({
-            'document_imports': '// no document imports',
-            'reference_imports': '// no reference imports',
-        }, **params)
 
         with self.change_dir(path):
             self.write_file('index.json', self._json_dumps(description))
-            self.write_file('{}.controller.ts'.format(name), controller_content)
-            self.write_file('{}.model.ts'.format(name), model_content)
+            self.write_file('{}.controller.ts'.format(name), ControllerTemplate, params)
+
+            self.write_file('{}.model.ts'.format(name), ModelTemplate, {
+                'document_imports': '// no document imports',
+                'reference_imports': '// no reference imports',
+            }, params)
 
 

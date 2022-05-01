@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     with open('tests/sample.yml', 'r') as f:
         project_config = ProjectConfig(**yaml.safe_load(f))
-        backend_config = BackendConfig(**project_config.backend)
+        backend_config = BackendConfig(**project_config.backend, plugins=project_config.plugins)
 
     Bootstrap.clone_repo(codegen_config)
 
