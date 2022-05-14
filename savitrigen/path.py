@@ -29,7 +29,7 @@ class PathlibWrapper(object):
     def make_dir(self, dirname:str) -> pathlib.Path:
         self.logger.info('MKDIR %s', dirname)
         path = self._get_path(dirname)
-        path.mkdir(parents=True)
+        path.mkdir(parents=True, exist_ok=True)
         return path
 
     def copy_file(self, src:str, dest:str) -> pathlib.Path:

@@ -1,4 +1,6 @@
 meta:
+  version: 1.0
+  alias: project_name
   product:
     name: Pizzaria Savitri
     group: Protolab

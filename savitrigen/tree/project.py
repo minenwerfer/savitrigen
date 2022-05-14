@@ -15,8 +15,7 @@ class ProjectTree():
             '@savitri/common',
             '@savitri/backend',
             '@savitri/frontend',
-            '@savitri/components',
-            'ts-node'
+            '@savitri/components'
         ]
 
         dependencies += self._config.plugins or []

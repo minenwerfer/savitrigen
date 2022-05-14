@@ -57,7 +57,7 @@ class FrontendTree():
             'name': '',
             'externals': {
                 'variables': {
-                    'productName': self._config.meta['product']['name'],
+                    'productName': self._config.meta.product.name,
                     'productLogo': 'logo.png',
                     'productLogoAlt': 'logo-alt.png',
                     'releases': self._config.has_releases,
