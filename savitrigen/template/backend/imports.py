@@ -12,7 +12,7 @@ r"import '../${camel_case}/${camel_case}.model'"
 
 """Used in index"""
 PluginImportTemplate = Template(
-r"import { backend as ${capitalized}Module } from '$plugin_module'"
+r"import { backend as ${capitalized}Module } from '$plugin_entity'"
 )
 
 PluginInstanceTemplate = Template(

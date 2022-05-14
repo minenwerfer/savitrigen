@@ -14,8 +14,11 @@ def TreeClass(layer:str, scope:str=None):
     return decorator
 
 class Tree(object):
-    path = PathlibWrapper()
+    path = None
     parent_dir: str
+
+    def __init__(self):
+        self.path = PathlibWrapper()
 
     def __getattr__(self, attr):
         def wrapped_method(*args, **kwargs):

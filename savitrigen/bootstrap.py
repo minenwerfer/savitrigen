@@ -19,5 +19,11 @@ class Bootstrap():
 
         stdout, stderr = process.communicate()
         os.chdir(str(cwd))
+
         return cwd
+
+    @staticmethod
+    def install():
+        os.system('sh -c "npm install"')
+        os.system('sh -c "cd node_modules/\@savitri/frontend && npm install"')
 

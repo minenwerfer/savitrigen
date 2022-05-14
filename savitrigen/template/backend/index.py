@@ -1,7 +1,7 @@
 from string import Template
 
 IndexTemplate = Template(
-r"""import { init } from 'savitri/dist/backend/server'
+r"""import { init } from '@savitri/backend'
 
 ${module_imports}
 

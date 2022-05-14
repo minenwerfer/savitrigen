@@ -2,6 +2,7 @@ import pathlib
 import contextlib
 import logging
 import typing
+from shutil import copy
 from string import Template
 from multipledispatch import dispatch
 
@@ -30,6 +31,10 @@ class PathlibWrapper(object):
         path = self._get_path(dirname)
         path.mkdir(parents=True)
         return path
+
+    def copy_file(self, src:str, dest:str) -> pathlib.Path:
+        res = copy(src, '{}/{}'.format(self.parent_dir, dest))
+        return self._get_path(res)
 
     def _write_file(self, fname:str, content:str) -> pathlib.Path:
         self.logger.info('WRITE %s', fname)

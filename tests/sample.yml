@@ -1,6 +1,7 @@
 meta:
   product:
     name: Pizzaria Savitri
+    group: Protolab
 
 plugins:
   - '@savitri/plugin-referral'
@@ -56,3 +57,5 @@ backend:
           description: Usando pizza gigante como referência
           type: number
 
+frontend:
+  has_releases: true

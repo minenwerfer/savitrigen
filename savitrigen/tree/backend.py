@@ -1,6 +1,6 @@
 from savitrigen.tree import TreeClass
 from savitrigen.config import BackendConfig
-from savitrigen.util import map_fields, make_ts_typehints, extract_modules
+from savitrigen.util import map_fields, make_ts_typehints, extract_entities
 from savitrigen.template.backend import (
     ControllerTemplate,
     ModelTemplate,
@@ -14,6 +14,8 @@ from savitrigen.template.backend import (
 @TreeClass('backend')
 class BackendTree():
     def __init__(self, config:BackendConfig):
+        super().__init__()
+
         self._config = config
         self._unused_keys = [
             'translation',
@@ -21,13 +23,14 @@ class BackendTree():
         ]
 
     def create(self):
+        self.copy_file('.sample.env', '.env')
         self.write_file('index.ts', IndexTemplate, {
             'module_imports': self._multiline_replace(
                 self._config.plugins,
                 PluginImportTemplate,
                 lambda _ : {
                     'capitalized': self._capitalize(_.split('-')[-1]),
-                    'plugin_module': _
+                    'plugin_entity': _
                 },
             ),
             'module_instances': self._multiline_replace(
@@ -40,13 +43,13 @@ class BackendTree():
         })
 
         for k, v in self._config.entities.items():
-            self.create_module(k, v)
+            self.create_entity(k, v)
 
     def create_build_json(self):
         content = self.json_dumps({})
         self.write_file('build.json', content)
 
-    def create_module(self, name:str, _description:dict):
+    def create_entity(self, name:str, _description:dict):
         """Creates entities
 
         Each module is supposed to contain 3 files:
@@ -59,12 +62,14 @@ class BackendTree():
         path = self.make_dir('entities/{}'.format(name))
 
         description = dict(module=name) | _description.__dict__
+        description['fields'] = description.pop('_fields')
+
         documentation = description.get('documentation').strip()
 
-        fields = description.get('fields')
+        fields = _description.fields
         mapped_fields = map_fields(fields)
 
-        entities = list(extract_modules(fields))
+        entities = list(extract_entities(fields))
         entities_names = [ entity[0] for entity in entities ]
 
         for k in self._unused_keys:

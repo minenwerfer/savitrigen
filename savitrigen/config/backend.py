@@ -7,6 +7,7 @@ from savitrigen.guideline import (
 @dataclass
 class Module(object):
     fields:dict
+    _fields:dict = field(init=False, repr=False)
 
     unicon:str = ''
     route:bool = False
@@ -16,6 +17,23 @@ class Module(object):
     """Those below are unused"""
     documentation:str = 'undocumented'
     translation:dict = None
+
+    @property
+    def fields(self) -> dict:
+        ms = dict()
+
+        for k, v in self._fields.items():
+            ms[k] = {
+                f_k: f_v
+                for f_k, f_v in v.items()
+                if f_v is not None
+            }
+
+        return ms
+
+    @fields.setter
+    def fields(self, value:dict) -> None:
+        self._fields = value
 
 @dataclass
 class Field(object):

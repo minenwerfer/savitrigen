@@ -21,9 +21,10 @@ ts_type_mapping = {
     'any': 'object',
 }
 
-def extract_module(field:dict) -> str:
+def extract_entity(field:dict) -> str:
     def extract_query(value:dict) -> dict:
-        return value.get('__query', None)
+        return value.get('__query', None) \
+            if type(value) is dict else None
 
     is_array = field.get('array', False)
 
@@ -41,9 +42,9 @@ def extract_module(field:dict) -> str:
                 is_array or isinstance(field['values'], list)
             )
 
-def extract_modules(fields:dict) -> str:
+def extract_entities(fields:dict) -> str:
     for k, v in fields.items():
-        _tuple = extract_module(v)
+        _tuple = extract_entity(v)
         if _tuple:
             yield _tuple
 
@@ -59,7 +60,7 @@ def map_fields(fields:dict) -> dict:
         k, v = item
         field_type = v.get('type', 'text')
 
-        _tuple = extract_module(v)
+        _tuple = extract_entity(v)
         if _tuple:
             module, is_array = _tuple
             return a | { k: '{}Document{}'.format(

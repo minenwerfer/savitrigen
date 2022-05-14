@@ -2,6 +2,11 @@ from dataclasses import dataclass
 
 @dataclass
 class FrontendConfig(object):
+    meta:dict
+    entities:list[str]
+
+    plugins:list[str] = None
+
     notice:str = None
     signin_text:str = None
 

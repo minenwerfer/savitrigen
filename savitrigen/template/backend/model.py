@@ -1,7 +1,7 @@
 from string import Template
 
 ModelTemplate = Template(
-r"""import { mongoose, options, descriptionToSchema } from 'savitri/dist/backend'
+r"""import { mongoose, options, descriptionToSchema } from '@savitri/backend'
 import { default as Description } from './index.json'
 
 ${document_imports}
