@@ -17,7 +17,7 @@ ts_type_mapping = {
         'objectid'
     ],
     'boolean': 'boolean',
-    'DateTime': 'datetime',
+    'Date': 'datetime',
     'any': 'object',
 }
 

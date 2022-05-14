@@ -1,3 +1,4 @@
+import typing
 from dataclasses import dataclass, field
 from savitrigen.guideline import (
     check_module_naming,
@@ -38,13 +39,18 @@ class Module(object):
 @dataclass
 class Field(object):
     label:str
-    type:str
+    type:str = None
 
     description:str = None
 
     required:bool = False
     readonly:bool = False
     values:list = None
+    mask:str = None
+
+    """Module specific properties"""
+    module:str = None
+    index:typing.Union[str,list[str]] = None
 
 
 @dataclass

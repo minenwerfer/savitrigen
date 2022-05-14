@@ -22,9 +22,19 @@ setup(
     author='João Santos',
     author_email='joaosan177@gmail.com',
     description='Savitri code generator',
-    loing_description=long_description,
+    long_description=long_description,
     long_description_content_type='text/x-rst',
     packages=find_packages(),
+    scripts=['scripts/savitrigen'],
+    data_files=[
+        ('config', [
+            'data/config.yml',
+        ]),
+        ('presets', [
+            'data/presets/sample.yml',
+            'data/presets/iptv.yml',
+        ])
+    ],
     install_requires=[
         'multipledispatch==0.6.0',
         'pyyaml==6.0'

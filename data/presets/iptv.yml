@@ -1,0 +1,87 @@
+meta:
+  version: 1.0
+  alias: project_name
+  product:
+    name: IPTV
+    group: Protolab
+
+backend:
+  entities:
+    contract:
+      unicon: file-alt
+      route: true
+      report: true
+      presets:
+        - crud
+      fields:
+        expiry_date:
+          label: Data de expiração
+          type: datetime
+        customer:
+          label: Cliente
+          module: customer
+          index: document
+        service:
+          label: Serviço
+          type: select
+          values:
+            - __query:
+              module: service
+              index: name
+        hosting:
+          label: Hospedagem
+          type: select
+          values:
+            - __query:
+              module: hosting
+              index: name
+
+    customer:
+      unicon: user-alt
+      route: true
+      report: true
+      presets:
+        - crud
+      fields:
+        name:
+          label: Nome
+          type: text
+        document:
+          label: CPF
+          type: text
+          mask: '###.###.###-##'
+        email:
+          label: E-mail
+          type: text
+        phone:
+          label: Telefone
+          type: text
+          mask: '(##) #####-####'
+
+    service:
+      route: true
+      report: true
+      presets:
+        - crud
+      fields:
+        name:
+          label: Nome
+          type: text
+        price:
+          label: Preço
+          type: number
+
+    hosting:
+      route: true
+      presets:
+        - crud
+      fields:
+        name:
+          label: Nome
+          type: text
+        url:
+          label: URL
+          type: text
+
+frontend:
+  has_releases: true

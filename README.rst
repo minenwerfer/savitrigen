@@ -1,5 +1,3 @@
-|build| |coverage| |docs| |pypi|
-
 savitrigen
 =========
 

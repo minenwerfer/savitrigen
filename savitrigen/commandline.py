@@ -1,8 +1,7 @@
 import yaml
-import shutil
-import os
 
 import savitrigen.logging
+from savitrigen.userdir import CONFIG_PATH, copy_from_userdir, get_presets
 from savitrigen.tree.frontend import FrontendTree
 from savitrigen.tree.backend import BackendTree
 from savitrigen.tree.project import ProjectTree
@@ -15,17 +14,8 @@ from savitrigen.config import (
 )
 
 def main():
-    config_path = os.path.join(os.path.expanduser('~'), '.savitrigen')
-    script_path = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-
-    if not os.path.isdir(config_path):
-        os.mkdir(config_path)
-        shutil.copyfile(
-            '{}/{}'.format(script_path, 'config.yml'),
-            '{}/{}'.format(config_path, 'config.yml')
-        )
-
-    with open('{}/{}'.format(config_path, 'config.yml'), 'r') as f:
+    """Main code generation routine"""
+    with open('{}/{}'.format(CONFIG_PATH, 'config/config.yml'), 'r') as f:
         codegen_config = CodegenConfig(**yaml.safe_load(f))
 
     with open('briefing.yml', 'r') as f:
@@ -49,3 +39,12 @@ def main():
     FrontendTree(frontend_config).create()
 
     Bootstrap.install()
+
+
+def preset(name:str):
+    """Copies ~/.savitrigen/presets/[name].yml to current directory"""
+    copy_from_userdir('presets/{}.yml'.format(name), 'briefing.yml')
+
+def list_presets():
+    for p in get_presets():
+        print(' - {}'.format(p))
