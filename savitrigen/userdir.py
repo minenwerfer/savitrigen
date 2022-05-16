@@ -6,7 +6,7 @@ from pathlib import Path
 CONFIG_PATH = os.path.join(os.path.expanduser('~'), '.savitrigen')
 
 """Path that holds package files"""
-SCRIPT_PATH = '/'.join(os.path.realpath(__file__).split('/')[:-1])
+SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 def make_userdir():
     config_path = Path(CONFIG_PATH)
@@ -14,16 +14,11 @@ def make_userdir():
     if not config_path.exists():
         config_path.mkdir(exist_ok=True)
 
-    def copy_to_userdir(fname: str):
-        return shutil.copytree(
-            '{}/{}'.format(os.path.join(SCRIPT_PATH, '..'), fname),
-            '{}/{}'.format(CONFIG_PATH, fname.split('/')[-1]),
-            dirs_exist_ok=True
-        )
-
-    copy_to_userdir('config')
-    copy_to_userdir('presets')
-
+    shutil.copytree(
+        os.path.join(SCRIPT_PATH, 'data'),
+        CONFIG_PATH,
+        dirs_exist_ok=True
+    )
 
 def copy_from_userdir(fname:str, dest:str, exist_ok:bool=False):
     if not exist_ok and Path(dest).exists():

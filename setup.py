@@ -26,15 +26,13 @@ setup(
     long_description_content_type='text/x-rst',
     packages=find_packages(),
     scripts=['scripts/savitrigen'],
-    data_files=[
-        ('config', [
+    include_package_data=True,
+    package_data={
+        'savitrigen': [
             'data/config.yml',
-        ]),
-        ('presets', [
-            'data/presets/sample.yml',
-            'data/presets/iptv.yml',
-        ])
-    ],
+            'data/presets/*.yml'
+        ]
+    },
     install_requires=[
         'multipledispatch==0.6.0',
         'pyyaml==6.0'

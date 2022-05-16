@@ -27,6 +27,6 @@ class Bootstrap():
         if Path(Path.cwd() / Path('node_modules')).exists():
             return
 
-        os.system('sh -c "npm install"')
-        os.system('sh -c "cd node_modules/\@savitri/frontend && npm install"')
+        os.system('npm install')
+        os.system('cd node_modules/\@savitri/frontend && npm install')
 

@@ -26,18 +26,18 @@ backend:
           type: select
           values:
             - __query:
-              module: service
-              index: name
+                module: service
+                index: name
         hosting:
           label: Hospedagem
           type: select
           values:
             - __query:
-              module: hosting
-              index: name
+                module: hosting
+                index: name
 
     customer:
-      unicon: user-alt
+      unicon: user-circle
       route: true
       report: true
       presets:

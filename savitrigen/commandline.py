@@ -15,7 +15,7 @@ from savitrigen.config import (
 
 def main():
     """Main code generation routine"""
-    with open('{}/{}'.format(CONFIG_PATH, 'config/config.yml'), 'r') as f:
+    with open('{}/{}'.format(CONFIG_PATH, 'config.yml'), 'r') as f:
         codegen_config = CodegenConfig(**yaml.safe_load(f))
 
     with open('briefing.yml', 'r') as f:
@@ -48,3 +48,7 @@ def preset(name:str):
 def list_presets():
     for p in get_presets():
         print(' - {}'.format(p))
+
+def print_version():
+    from savitrigen import __version__
+    print(__version__)
