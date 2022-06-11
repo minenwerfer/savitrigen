@@ -25,6 +25,12 @@ const options = {
 ${module_instances}
     InternalModule()
   ],
+  i18n: {
+    locale: '${default_locale}',
+    messages: {
+${locale_imports}
+    }
+  },
   menuSchema: {
     'Início': {
       children: [

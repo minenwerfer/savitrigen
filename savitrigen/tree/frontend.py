@@ -1,3 +1,5 @@
+import json
+from contextlib import suppress
 from string import Template
 from savitrigen.tree import TreeClass
 from savitrigen.config import FrontendConfig
@@ -8,6 +10,7 @@ from savitrigen.template.frontend import (
     StoreTemplate,
     PluginImportTemplate,
     PluginInstanceTemplate,
+    LocaleImportTemplate,
     InternalRouterTemplate,
     InternalHomeComponentTemplate
 )
@@ -21,6 +24,17 @@ class FrontendTree():
     def create(self):
         self.create_build_json()
         self.create_module('internal')
+
+        translation_table = {}
+        for entity_name, entity in [(k, v) for k, v in self._config.entities.items() if v.translation]:
+            for locale, translation in entity.translation.items():
+                if locale not in translation_table:
+                    translation_table[locale] = {}
+
+                translation_table[locale] |= {
+                    entity_name: translation
+                }
+
 
         self.write_file('index.ts', IndexTemplate, {
             'module_imports': self._multiline_replace(
@@ -38,6 +52,15 @@ class FrontendTree():
                     'capitalized': ' '*4 + self._capitalize(_.split('-')[-1])
                 }
             ),
+            'default_locale': self._config.default_locale,
+            'locale_imports': self._multiline_replace(
+                translation_table.keys(),
+                LocaleImportTemplate,
+                lambda _ : {
+                    'locale_key': ' '*6 + _,
+                    'locale': _
+                }
+            ),
             'menu_entries': self._multiline_replace(
                 self._config.entities.keys(),
                 Template(' '*8 + "'dashboard-${entity_name}',"),
@@ -46,6 +69,9 @@ class FrontendTree():
                 }
             )
         })
+
+        for locale, table in translation_table.items():
+            self.update_i18n(locale, table)
 
         with self.change_dir('modules/internal'):
             self.write_file('router.ts', InternalRouterTemplate, {})
@@ -80,3 +106,15 @@ class FrontendTree():
             self.write_file('index.ts', ModuleIndexTemplate, {})
             self.write_file('router.ts', RouterTemplate, {})
             self.write_file('store/index.ts', StoreTemplate, {})
+
+    def update_i18n(self, locale:str, new_table):
+        path = self.make_dir('i18n/{}'.format(locale))
+        table = {}
+
+        with self.change_dir(path):
+            with suppress(FileNotFoundError):
+                index_content = self.read_file('index.json')
+                table = json.loads(index_content)
+
+            table |= new_table
+            self.write_file('index.json', self._json_dumps(table))

@@ -12,7 +12,7 @@ plugins:
 backend:
   entities:
     pizza:
-      documentation: >
+      documentation: |
         Pizzas disponíveis no cardápio do estabelecimento.
         O usuário cadastra o nome da pizza e os ingredientes e o preço é automaticamente calculado.
       translation:
@@ -44,7 +44,7 @@ backend:
 
     ingredient:
       translation:
-        pt_BR: ingrediente | ingredients
+        pt_BR: ingrediente | ingredientes
 
       unicon: chart-pie-alt
       route: true
@@ -61,3 +61,4 @@ backend:
 
 frontend:
   has_releases: true
+  default_locale: pt_BR

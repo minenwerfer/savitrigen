@@ -23,7 +23,7 @@ class BackendTree():
         ]
 
     def create(self):
-        self.copy_file('.sample.env', '.env')
+        self.copy_file('sample.env', '.env')
         self.write_file('index.ts', IndexTemplate, {
             'module_imports': self._multiline_replace(
                 self._config.plugins,

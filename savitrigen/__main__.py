@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Savitrigen')
     parser.add_argument('-l', '--list-presets', action='store_true', help='lists available presets then exits')
-    parser.add_argument('-p', '--preset', help='creates briefing.yml from a preset then exits')
+    parser.add_argument('-p', '--preset', help='creates savitrigen.yml from a preset then exits')
     parser.add_argument('-v', '--version', action='store_true', help='displays version then exits')
 
     args = parser.parse_args()

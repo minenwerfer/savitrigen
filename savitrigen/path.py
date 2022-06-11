@@ -27,19 +27,24 @@ class PathlibWrapper(object):
             self.parent_dir = previous_dir
 
     def make_dir(self, dirname:str) -> pathlib.Path:
-        self.logger.info('MKDIR %s', dirname)
         path = self._get_path(dirname)
-        path.mkdir(parents=True, exist_ok=True)
+        with contextlib.suppress(FileExistsError):
+            path.mkdir(parents=True)
+            self.logger.info('MKDIR %s', dirname)
         return path
 
     def copy_file(self, src:str, dest:str) -> pathlib.Path:
         res = copy(src, '{}/{}'.format(self.parent_dir, dest))
         return self._get_path(res)
 
-    def _write_file(self, fname:str, content:str) -> pathlib.Path:
-        self.logger.info('WRITE %s', fname)
-        path = self._get_path(fname)
+    def read_file(self, file:typing.Union[str, pathlib.Path]) -> str:
+        path = self._get_path(file)
+        return path.read_text()
+
+    def _write_file(self, file:typing.Union[str, pathlib.Path], content:str, patch=True) -> pathlib.Path:
+        path = self._get_path(file)
         path.write_bytes(content.encode())
+        self.logger.info('WRITE %s', file)
         return path
 
     @dispatch(str, str)

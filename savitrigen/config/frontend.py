@@ -4,6 +4,7 @@ from dataclasses import dataclass
 class FrontendConfig(object):
     meta:dict
     entities:list[str]
+    default_locale:str
 
     plugins:list[str] = None
 

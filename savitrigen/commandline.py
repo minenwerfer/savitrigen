@@ -18,7 +18,7 @@ def main():
     with open('{}/{}'.format(CONFIG_PATH, 'config.yml'), 'r') as f:
         codegen_config = CodegenConfig(**yaml.safe_load(f))
 
-    with open('briefing.yml', 'r') as f:
+    with open('savitrigen.yml', 'r') as f:
         project_config = ProjectConfig(**yaml.safe_load(f))
         backend_config = BackendConfig(
             **project_config.backend,
@@ -43,7 +43,7 @@ def main():
 
 def preset(name:str):
     """Copies ~/.savitrigen/presets/[name].yml to current directory"""
-    copy_from_userdir('presets/{}.yml'.format(name), 'briefing.yml')
+    copy_from_userdir('presets/{}.yml'.format(name), 'savitrigen.yml')
 
 def list_presets():
     for p in get_presets():
