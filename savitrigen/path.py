@@ -2,14 +2,19 @@ import pathlib
 import contextlib
 import logging
 import typing
+import re
 from shutil import copy
 from string import Template
 from multipledispatch import dispatch
+from diff_match_patch import diff_match_patch
 
 class PathlibWrapper(object):
-    def __init__(self):
+    def __init__(self, silent:bool=False):
+        self.silent = silent
+        self.on_cache = False
         self.logger = logging.getLogger('path')
         self.parent_dir = None
+        self.dmp = diff_match_patch()
 
     def _get_path(self, path) -> pathlib.Path:
         if isinstance(path, pathlib.Path):
@@ -30,7 +35,8 @@ class PathlibWrapper(object):
         path = self._get_path(dirname)
         with contextlib.suppress(FileExistsError):
             path.mkdir(parents=True)
-            self.logger.info('MKDIR %s', dirname)
+            if not self.silent:
+                self.logger.info('MKDIR %s', dirname)
         return path
 
     def copy_file(self, src:str, dest:str) -> pathlib.Path:
@@ -41,20 +47,31 @@ class PathlibWrapper(object):
         path = self._get_path(file)
         return path.read_text()
 
-    def _write_file(self, file:typing.Union[str, pathlib.Path], content:str, patch=True) -> pathlib.Path:
+    def _write_file(self, file:typing.Union[pathlib.PosixPath, str], content:str, patch=True) -> pathlib.Path:
         path = self._get_path(file)
+
+        if not self.on_cache and path.exists():
+            cached_path = re.sub(r'^source/', '.savitricache/', str(path))
+            cached_path = pathlib.Path(cached_path)
+
+            if cached_path.exists():
+                cached = cached_path.read_text()
+                patches = self.dmp.patch_make(cached, content)
+                content, _ = self.dmp.patch_apply(patches, path.read_text())
+
         path.write_bytes(content.encode())
-        self.logger.info('WRITE %s', file)
+        if not self.silent:
+            self.logger.info('WRITE %s', file)
         return path
 
-    @dispatch(str, str)
+    @dispatch(pathlib.PosixPath, str)
     def write_file(self, *args, **kwargs) -> pathlib.Path:
         return self._write_file(*args, **kwargs)
 
-    @dispatch(str, Template, dict)
-    def write_file(self, fname:str, template:Template, replacements:dict) -> pathlib.Path:
+    @dispatch(pathlib.PosixPath, Template, dict)
+    def write_file(self, fname:pathlib.PosixPath, template:Template, replacements:dict) -> pathlib.Path:
         return self._write_file(fname, template.substitute(**replacements))
 
-    @dispatch(str, Template, dict, dict)
-    def write_file(self, fname:str, template:Template, fallback:dict, replacements:dict) -> pathlib.Path:
+    @dispatch(pathlib.PosixPath, Template, dict, dict)
+    def write_file(self, fname:pathlib.PosixPath, template:Template, fallback:dict, replacements:dict) -> pathlib.Path:
         return self._write_file(fname, template.substitute(fallback, **replacements))

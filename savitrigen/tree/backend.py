@@ -23,7 +23,9 @@ class BackendTree():
         ]
 
     def create(self):
-        self.copy_file('sample.env', '.env')
+        if not self.on_cache:
+            self.copy_file('sample.env', '.env')
+
         self.write_file('index.ts', IndexTemplate, {
             'module_imports': self._multiline_replace(
                 self._config.plugins,
@@ -61,7 +63,7 @@ class BackendTree():
         """
         path = self.make_dir('entities/{}'.format(name))
 
-        description = dict(module=name) | _description.__dict__
+        description = dict() | _description.__dict__
         description['fields'] = description.pop('_fields')
 
         documentation = description.get('documentation').strip()

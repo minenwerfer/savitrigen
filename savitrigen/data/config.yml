@@ -1,2 +1,5 @@
 # savitri boilerplate repository
 boilerplate_repo_url: https://github.com/protolabsystems/savitri-boilerplate
+
+rules:
+  documentation: raise

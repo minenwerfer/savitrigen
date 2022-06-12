@@ -6,6 +6,8 @@ from savitrigen.tree.frontend import FrontendTree
 from savitrigen.tree.backend import BackendTree
 from savitrigen.tree.project import ProjectTree
 from savitrigen.bootstrap import Bootstrap
+from savitrigen.cache import Cache
+from savitrigen.source import Source
 from savitrigen.config import (
     CodegenConfig,
     ProjectConfig,
@@ -34,9 +36,14 @@ def main():
 
     Bootstrap.clone_repo(codegen_config)
 
-    ProjectTree(project_config).create()
-    BackendTree(backend_config).create()
-    FrontendTree(frontend_config).create()
+    project_tree, backend_tree, frontend_tree = (
+        ProjectTree(project_config),
+        BackendTree(backend_config),
+        FrontendTree(frontend_config)
+    )
+
+    Source().create([project_tree, backend_tree, frontend_tree])
+    Cache().create([project_tree, backend_tree, frontend_tree])
 
     Bootstrap.install()
 

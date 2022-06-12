@@ -1,12 +1,13 @@
 import typing
 from dataclasses import dataclass, field
 from savitrigen.guideline import (
-    check_module_naming,
+    check_entity_naming,
     check_field_naming
 )
 
 @dataclass
-class Module(object):
+class Entity(object):
+    module:str
     fields:dict
     _fields:dict = field(init=False, repr=False)
 
@@ -48,7 +49,7 @@ class Field(object):
     values:list = None
     mask:str = None
 
-    """Module specific properties"""
+    """Entity specific properties"""
     module:str = None
     index:typing.Union[str,list[str]] = None
 
@@ -69,11 +70,14 @@ class BackendConfig(object):
         ms = dict()
 
         for k, v in value.items():
-            ms[k] = module = Module(**v)
-            check_module_naming(k)
+            ms[k] = entity = Entity(**(v | dict(module=k)))
+            check_entity_naming(k)
 
-            for f_k, f_v in module.fields.items():
-                module.fields[f_k] = Field(**f_v).__dict__
+            for f_k, f_v in entity.fields.items():
+                entity.fields[f_k] = Field(**f_v).__dict__
                 check_field_naming(f_k)
+
+            if True and 'documentation' not in v:
+                raise ValueError('current config requires all entities to be documented whereas "{}" is not'.format(k))
 
         self._entities = ms

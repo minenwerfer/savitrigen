@@ -24,7 +24,8 @@ class Tree(object):
         def wrapped_method(*args, **kwargs):
             if hasattr(self.path, attr):
                 if not self.path.parent_dir:
-                    self.path.parent_dir = 'packages/{}{}'.format(
+                    self.path.parent_dir = '{}/packages/{}{}'.format(
+                        'source' if not self.on_cache else '.savitricache',
                         f'{self.scope}-' if self.scope else '',
                         self.layer
                     )
@@ -32,6 +33,9 @@ class Tree(object):
                 path = '{}/{}'.format(self.path.parent_dir, args[0]) \
                     if not isinstance(args[0], pathlib.Path) \
                     else args[0]
+
+                if not isinstance(path, pathlib.Path):
+                    path = pathlib.Path(path)
 
                 return getattr(self.path, attr)(path, *args[1:], **kwargs)
         return wrapped_method
@@ -59,3 +63,14 @@ class Tree(object):
     @staticmethod
     def _camel_case(string:str) -> str:
         return string[0].lower() + string[1:]
+
+    @property
+    def on_cache(self) -> bool:
+        return self.path.on_cache
+
+    def set_on_cache(self, value:bool):
+        self.path.on_cache = value
+        self.path.parent_dir = None
+
+    def set_silent(self, value:bool):
+        self.path.silent = value

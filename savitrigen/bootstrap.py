@@ -19,7 +19,6 @@ class Bootstrap():
 
             stdout, stderr = process.communicate()
 
-        os.chdir(str(cwd))
         return cwd
 
     @staticmethod
@@ -27,6 +26,6 @@ class Bootstrap():
         if Path(Path.cwd() / Path('node_modules')).exists():
             return
 
-        os.system('npm install')
+        os.system('cd source && npm install')
         os.system('cd node_modules/\@savitri/frontend && npm install')
 

@@ -1,5 +1,5 @@
 from .rules import (
-    MODULE_NAMING,
+    ENTITY_NAMING,
     FIELD_NAMING,
     PLUGIN_NAMING
 )
