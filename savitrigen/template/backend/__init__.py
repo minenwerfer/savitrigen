@@ -4,6 +4,7 @@ from .model import ModelTemplate
 
 from .imports import (
     DocumentImportTemplate,
+    CommonDocumentImportTemplate,
     ReferenceImportTemplate,
     PluginImportTemplate,
     PluginInstanceTemplate

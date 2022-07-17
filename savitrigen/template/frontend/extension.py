@@ -1,7 +1,7 @@
 from string import Template
 
 RouterTemplate = Template(
-r"""import { RouterExtension } from 'frontend/router'
+r"""import { RouterExtension } from '@savitri/frontend'
 
 export const routerExtension: RouterExtension = {
   //

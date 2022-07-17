@@ -10,7 +10,7 @@ plugins:
   - '@savitri/plugin-videoroom'
 
 backend:
-  entities:
+  collections:
     pizza:
       documentation: |
         Pizzas disponíveis no cardápio do estabelecimento.

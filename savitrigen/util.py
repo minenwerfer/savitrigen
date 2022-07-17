@@ -3,10 +3,11 @@ from functools import reduce
 ts_type_mapping = {
     'string': [
         'text',
+        'textarea',
         'string',
         'select',
         'checkbox',
-        'readio'
+        'radio'
     ],
     'number': [
         'number',
@@ -21,7 +22,7 @@ ts_type_mapping = {
     'any': 'object',
 }
 
-def extract_entity(field:dict) -> str:
+def extract_collection(field:dict) -> str:
     def extract_query(value:dict) -> dict:
         return value.get('__query', None) \
             if type(value) is dict else None
@@ -42,25 +43,30 @@ def extract_entity(field:dict) -> str:
                 is_array or isinstance(field['values'], list)
             )
 
-def extract_entities(fields:dict) -> str:
+def extract_collections(fields:dict) -> str:
     for k, v in fields.items():
-        _tuple = extract_entity(v)
+        _tuple = extract_collection(v)
         if _tuple:
             yield _tuple
 
 def convert_type(name:str) -> dict:
-    return next((
+    t = next((
         k
         for k, v in ts_type_mapping.items()
         if name in v
     ), None)
+
+    if not t:
+        raise Exception('unknown type "{}"'.format(name))
+
+    return t
 
 def map_fields(fields:dict) -> dict:
     def reducer(a:dict, item:tuple) -> dict:
         k, v = item
         field_type = v.get('type', 'text')
 
-        _tuple = extract_entity(v)
+        _tuple = extract_collection(v)
         if _tuple:
             module, is_array = _tuple
             return a | { k: '{}Document{}'.format(

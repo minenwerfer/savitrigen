@@ -8,7 +8,7 @@ from savitrigen.tree.project import ProjectTree
 from savitrigen.bootstrap import Bootstrap
 from savitrigen.cache import Cache
 from savitrigen.source import Source
-from savitrigen.config import (
+from savitrigen.schema import (
     CodegenConfig,
     ProjectConfig,
     BackendConfig,
@@ -30,7 +30,7 @@ def main():
         frontend_config = FrontendConfig(
             **project_config.frontend,
             meta=project_config.meta,
-            entities=backend_config.entities,
+            collections=backend_config.collections,
             plugins=project_config.plugins
         )
 

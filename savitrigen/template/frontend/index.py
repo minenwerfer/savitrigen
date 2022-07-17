@@ -29,6 +29,7 @@ ${module_instances}
     locale: '${default_locale}',
     messages: {
 ${locale_imports}
+    ...require('./i18n/pt_BR/index.json')
     }
   },
   menuSchema: {

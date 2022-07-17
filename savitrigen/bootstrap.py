@@ -3,7 +3,7 @@ import subprocess
 import yaml
 from pathlib import Path
 
-from savitrigen.config import CodegenConfig
+from savitrigen.schema import CodegenConfig
 
 class Bootstrap():
     @staticmethod
@@ -23,9 +23,7 @@ class Bootstrap():
 
     @staticmethod
     def install():
-        if Path(Path.cwd() / Path('node_modules')).exists():
-            return
+        if not Path(Path.cwd() / Path('source/node_modules')).exists():
+            os.system('cd source && npm install')
 
-        os.system('cd source && npm install')
-        os.system('cd node_modules/\@savitri/frontend && npm install')
 

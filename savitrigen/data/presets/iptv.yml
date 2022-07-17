@@ -6,7 +6,7 @@ meta:
     group: Protolab
 
 backend:
-  entities:
+  collections:
     contract:
       unicon: file-alt
       route: true

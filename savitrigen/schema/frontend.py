@@ -3,7 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class FrontendConfig(object):
     meta:dict
-    entities:list[str]
+    collections:list[str]
     default_locale:str
 
     plugins:list[str] = None

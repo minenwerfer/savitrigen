@@ -41,10 +41,13 @@ class Tree(object):
         return wrapped_method
 
     @staticmethod
-    def _multiline_replace(subjects:list, template:Template, func) -> str:
+    def _multiline_replace(subjects:list, _template:Template, func) -> str:
         def reducer(a:str, item) -> str:
             result = func(item)
-            return a + [template.substitute(**result)]
+            template = _template(item) if callable(_template) else _template
+            return a + [template.substitute(**result)] \
+                if template \
+                else a
 
         return "\n".join(reduce(reducer, subjects, []))\
 

@@ -1,12 +1,12 @@
 import typing
 from dataclasses import dataclass, field
 from savitrigen.guideline import (
-    check_entity_naming,
+    check_collection_naming,
     check_field_naming
 )
 
 @dataclass
-class Entity(object):
+class Collection(object):
     module:str
     fields:dict
     _fields:dict = field(init=False, repr=False)
@@ -14,7 +14,8 @@ class Entity(object):
     unicon:str = ''
     route:bool = False
     report:bool = False
-    presets:list = None
+    presets:list[str] = None
+    methods:list[str] = None
 
     """Those below are unused"""
     documentation:str = 'undocumented'
@@ -46,38 +47,39 @@ class Field(object):
 
     required:bool = False
     readonly:bool = False
+    array:bool = False
     values:list = None
     mask:str = None
 
-    """Entity specific properties"""
+    """Collection specific properties"""
     module:str = None
     index:typing.Union[str,list[str]] = None
 
 
 @dataclass
 class BackendConfig(object):
-    entities:dict
-    _entities:dict = field(init=False, repr=False)
+    collections:dict
+    _collections:dict = field(init=False, repr=False)
 
     plugins:list[str] = None
 
     @property
-    def entities(self) -> dict:
-        return self._entities
+    def collections(self) -> dict:
+        return self._collections
 
-    @entities.setter
-    def entities(self, value:dict) -> None:
+    @collections.setter
+    def collections(self, value:dict) -> None:
         ms = dict()
 
         for k, v in value.items():
-            ms[k] = entity = Entity(**(v | dict(module=k)))
-            check_entity_naming(k)
+            ms[k] = collection = Collection(**(v | dict(module=k)))
+            check_collection_naming(k)
 
-            for f_k, f_v in entity.fields.items():
-                entity.fields[f_k] = Field(**f_v).__dict__
+            for f_k, f_v in collection.fields.items():
+                collection.fields[f_k] = Field(**f_v).__dict__
                 check_field_naming(f_k)
 
             if True and 'documentation' not in v:
-                raise ValueError('current config requires all entities to be documented whereas "{}" is not'.format(k))
+                raise ValueError('current config requires all collections to be documented whereas "{}" is not'.format(k))
 
-        self._entities = ms
+        self._collections = ms

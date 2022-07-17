@@ -12,6 +12,6 @@ ${type_hints}
 }
 
 export const ${pascal_case}Schema = descriptionToSchema<${pascal_case}Document>(Description, options)
-export const ${pascal_case} = mongoose.model<${pascal_case}Document>('${pascal_case}', ${pascal_case}Schema)
+export const ${pascal_case} = mongoose.model<${pascal_case}Document>('${camel_case}', ${pascal_case}Schema)
 """)
 

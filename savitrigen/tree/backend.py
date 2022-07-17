@@ -1,10 +1,12 @@
+from savitrigen import __version__
 from savitrigen.tree import TreeClass
-from savitrigen.config import BackendConfig
-from savitrigen.util import map_fields, make_ts_typehints, extract_entities
+from savitrigen.schema import BackendConfig
+from savitrigen.util import map_fields, make_ts_typehints, extract_collections
 from savitrigen.template.backend import (
     ControllerTemplate,
     ModelTemplate,
     DocumentImportTemplate,
+    CommonDocumentImportTemplate,
     ReferenceImportTemplate,
     IndexTemplate,
     PluginImportTemplate,
@@ -22,6 +24,11 @@ class BackendTree():
             'documentation'
         ]
 
+        self._common_collections = [
+            'user',
+            'file'
+        ]
+
     def create(self):
         if not self.on_cache:
             self.copy_file('sample.env', '.env')
@@ -32,7 +39,7 @@ class BackendTree():
                 PluginImportTemplate,
                 lambda _ : {
                     'capitalized': self._capitalize(_.split('-')[-1]),
-                    'plugin_entity': _
+                    'plugin_collection': _
                 },
             ),
             'module_instances': self._multiline_replace(
@@ -44,15 +51,15 @@ class BackendTree():
             )
         })
 
-        for k, v in self._config.entities.items():
-            self.create_entity(k, v)
+        for k, v in self._config.collections.items():
+            self.create_collection(k, v)
 
     def create_build_json(self):
         content = self.json_dumps({})
         self.write_file('build.json', content)
 
-    def create_entity(self, name:str, _description:dict):
-        """Creates entities
+    def create_collection(self, name:str, _description:dict):
+        """Creates collections
 
         Each module is supposed to contain 3 files:
             - index.json
@@ -61,7 +68,7 @@ class BackendTree():
 
         Will also add a description to the controller file that may contain JSDoc symbols.
         """
-        path = self.make_dir('entities/{}'.format(name))
+        path = self.make_dir('collections/{}'.format(name))
 
         description = dict() | _description.__dict__
         description['fields'] = description.pop('_fields')
@@ -71,8 +78,8 @@ class BackendTree():
         fields = _description.fields
         mapped_fields = map_fields(fields)
 
-        entities = list(extract_entities(fields))
-        entities_names = [ entity[0] for entity in entities ]
+        collections = list(extract_collections(fields))
+        collections_names = [ collection[0] for collection in collections ]
 
         for k in self._unused_keys:
             if k in description:
@@ -83,24 +90,29 @@ class BackendTree():
             'camel_case': self._camel_case(name),
             'documentation': documentation,
             'type_hints': make_ts_typehints(mapped_fields),
+            'savitrigen_version': __version__,
             **({
                 'document_imports': self._multiline_replace(
-                    entities_names,
-                    DocumentImportTemplate,
+                    collections_names,
+                    lambda _ : CommonDocumentImportTemplate \
+                        if _ in self._common_collections \
+                        else DocumentImportTemplate,
                     lambda _ : {
                         'pascal_case': self._pascal_case(_),
                         'camel_case': self._camel_case(_)
                     }
                 ),
                 'reference_imports': self._multiline_replace(
-                    entities_names,
-                    ReferenceImportTemplate,
+                    collections_names,
+                    lambda _ : ReferenceImportTemplate \
+                        if _ not in self._common_collections \
+                        else None,
                     lambda _ : {
                         'camel_case': self._camel_case(_),
                     }
                 ),
 
-            } if len(entities) > 0 else {})
+            } if len(collections) > 0 else {})
         }
 
         with self.change_dir(path):

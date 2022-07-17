@@ -2,11 +2,10 @@ import pathlib
 import contextlib
 import logging
 import typing
-import re
 from shutil import copy
 from string import Template
 from multipledispatch import dispatch
-from diff_match_patch import diff_match_patch
+from diff_match_patch import diff_match_patch as Diff
 
 class PathlibWrapper(object):
     def __init__(self, silent:bool=False):
@@ -14,7 +13,7 @@ class PathlibWrapper(object):
         self.on_cache = False
         self.logger = logging.getLogger('path')
         self.parent_dir = None
-        self.dmp = diff_match_patch()
+        self.dmp = Diff()
 
     def _get_path(self, path) -> pathlib.Path:
         if isinstance(path, pathlib.Path):
@@ -51,7 +50,7 @@ class PathlibWrapper(object):
         path = self._get_path(file)
 
         if not self.on_cache and path.exists():
-            cached_path = re.sub(r'^source/', '.savitricache/', str(path))
+            cached_path = str(path).replace('source/', '.savitricache/', 1)
             cached_path = pathlib.Path(cached_path)
 
             if cached_path.exists():

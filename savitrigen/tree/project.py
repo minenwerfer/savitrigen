@@ -1,5 +1,5 @@
 from savitrigen.tree import TreeClass
-from savitrigen.config.project import ProjectConfig
+from savitrigen.schema.project import ProjectConfig
 
 @TreeClass('..')
 class ProjectTree():
@@ -15,7 +15,8 @@ class ProjectTree():
             '@savitri/common',
             '@savitri/backend',
             '@savitri/frontend',
-            '@savitri/components'
+            '@savitri/components',
+            '@savitri/i18n-ptbr'
         ]
 
         dependencies += self._config.plugins or []

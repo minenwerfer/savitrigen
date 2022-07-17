@@ -2,7 +2,7 @@ import json
 from contextlib import suppress
 from string import Template
 from savitrigen.tree import TreeClass
-from savitrigen.config import FrontendConfig
+from savitrigen.schema import FrontendConfig
 from savitrigen.template.frontend import (
     IndexTemplate,
     ModuleIndexTemplate,
@@ -23,16 +23,16 @@ class FrontendTree():
 
     def create(self):
         self.create_build_json()
-        self.create_module('internal')
+        self.create_module('internal', router_tpl=InternalRouterTemplate)
 
         translation_table = {}
-        for entity_name, entity in [(k, v) for k, v in self._config.entities.items() if v.translation]:
-            for locale, translation in entity.translation.items():
+        for collection_name, collection in [(k, v) for k, v in self._config.collections.items() if v.translation]:
+            for locale, translation in collection.translation.items():
                 if locale not in translation_table:
                     translation_table[locale] = {}
 
                 translation_table[locale] |= {
-                    entity_name: translation
+                    collection_name: translation
                 }
 
 
@@ -62,10 +62,10 @@ class FrontendTree():
                 }
             ),
             'menu_entries': self._multiline_replace(
-                self._config.entities.keys(),
-                Template(' '*8 + "'dashboard-${entity_name}',"),
+                self._config.collections.keys(),
+                Template(' '*8 + "'dashboard-${collection_name}',"),
                 lambda _ : {
-                    'entity_name': _
+                    'collection_name': _
                 }
             )
         })
@@ -74,9 +74,9 @@ class FrontendTree():
             self.update_i18n(locale, table)
 
         with self.change_dir('modules/internal'):
-            self.write_file('router.ts', InternalRouterTemplate, {})
             self.make_dir('components/dashboard/c-home')
             self.write_file('components/dashboard/c-home/c-home.vue', InternalHomeComponentTemplate, {})
+
 
     def create_build_json(self):
         content = self._json_dumps({
@@ -89,14 +89,13 @@ class FrontendTree():
                     'releases': self._config.has_releases,
                     'notification': self._config.has_notification,
                     'feedback': self._config.has_feedback,
-
                 }
             }
         })
 
         self.write_file('build.json', content)
 
-    def create_module(self, name:str):
+    def create_module(self, name:str, router_tpl=None):
         path = self.make_dir('modules/{}'.format(name))
 
         store_path = self.make_dir('modules/{}/store'.format(name))
@@ -104,7 +103,7 @@ class FrontendTree():
 
         with self.change_dir(path):
             self.write_file('index.ts', ModuleIndexTemplate, {})
-            self.write_file('router.ts', RouterTemplate, {})
+            self.write_file('router.ts', router_tpl or RouterTemplate, {})
             self.write_file('store/index.ts', StoreTemplate, {})
 
     def update_i18n(self, locale:str, new_table):

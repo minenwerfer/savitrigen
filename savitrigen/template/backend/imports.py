@@ -9,10 +9,13 @@ ReferenceImportTemplate = Template(
 r"import '../${camel_case}/${camel_case}.model'"
 )
 
+CommonDocumentImportTemplate = Template(
+r"import { ${pascal_case}Document } from '@savitri/backend/collections'"
+)
 
 """Used in index"""
 PluginImportTemplate = Template(
-r"import { backend as ${capitalized}Module } from '$plugin_entity'"
+r"import { backend as ${capitalized}Module } from '$plugin_collection'"
 )
 
 PluginInstanceTemplate = Template(
