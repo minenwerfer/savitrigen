@@ -3,11 +3,11 @@ import subprocess
 import yaml
 from pathlib import Path
 
-from savitrigen.schema import CodegenConfig
+from savitrigen.schema import CodegenSchema
 
 class Bootstrap():
     @staticmethod
-    def clone_repo(config:CodegenConfig):
+    def clone_repo(config:CodegenSchema):
         cwd = Path('source')
         if not Path(cwd / Path('.gitignore')).exists():
             process = subprocess.Popen([

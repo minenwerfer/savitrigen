@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class FrontendConfig(object):
+class FrontendSchema(object):
     meta:dict
     collections:list[str]
     default_locale:str

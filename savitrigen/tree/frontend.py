@@ -2,7 +2,7 @@ import json
 from contextlib import suppress
 from string import Template
 from savitrigen.tree import TreeClass
-from savitrigen.schema import FrontendConfig
+from savitrigen.schema import FrontendSchema
 from savitrigen.template.frontend import (
     IndexTemplate,
     ModuleIndexTemplate,
@@ -17,16 +17,16 @@ from savitrigen.template.frontend import (
 
 @TreeClass('frontend')
 class FrontendTree():
-    def __init__(self, config:FrontendConfig):
+    def __init__(self, schema:FrontendSchema):
         super().__init__()
-        self._config = config
+        self._schema = schema
 
     def create(self):
         self.create_build_json()
         self.create_module('internal', router_tpl=InternalRouterTemplate)
 
         translation_table = {}
-        for collection_name, collection in [(k, v) for k, v in self._config.collections.items() if v.translation]:
+        for collection_name, collection in [(k, v) for k, v in self._schema.collections.items() if v.translation]:
             for locale, translation in collection.translation.items():
                 if locale not in translation_table:
                     translation_table[locale] = {}
@@ -38,7 +38,7 @@ class FrontendTree():
 
         self.write_file('index.ts', IndexTemplate, {
             'module_imports': self._multiline_replace(
-                self._config.plugins,
+                self._schema.plugins,
                 PluginImportTemplate,
                 lambda _ : {
                     'capitalized': self._capitalize(_.split('-')[-1]),
@@ -46,13 +46,13 @@ class FrontendTree():
                 }
             ),
             'module_instances': self._multiline_replace(
-                self._config.plugins,
+                self._schema.plugins,
                 PluginInstanceTemplate,
                 lambda _ : {
                     'capitalized': ' '*4 + self._capitalize(_.split('-')[-1])
                 }
             ),
-            'default_locale': self._config.default_locale,
+            'default_locale': self._schema.default_locale,
             'locale_imports': self._multiline_replace(
                 translation_table.keys(),
                 LocaleImportTemplate,
@@ -62,7 +62,7 @@ class FrontendTree():
                 }
             ),
             'menu_entries': self._multiline_replace(
-                self._config.collections.keys(),
+                self._schema.collections.keys(),
                 Template(' '*8 + "'dashboard-${collection_name}',"),
                 lambda _ : {
                     'collection_name': _
@@ -83,12 +83,12 @@ class FrontendTree():
             'name': '',
             'externals': {
                 'variables': {
-                    'productName': self._config.meta.product.name,
+                    'productName': self._schema.meta.product.name,
                     'productLogo': 'logo.png',
                     'productLogoAlt': 'logo-alt.png',
-                    'releases': self._config.has_releases,
-                    'notification': self._config.has_notification,
-                    'feedback': self._config.has_feedback,
+                    'releases': self._schema.has_releases,
+                    'notification': self._schema.has_notification,
+                    'feedback': self._schema.has_feedback,
                 }
             }
         })

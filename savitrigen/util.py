@@ -69,10 +69,10 @@ def map_fields(fields:dict) -> dict:
         _tuple = extract_collection(v)
         if _tuple:
             module, is_array = _tuple
-            return a | { k: '{}Document{}'.format(
-                module[0].upper() + module[1:],
-                '[]' if is_array else ''
-            ) }
+            type_name = '{}Document'.format(module[0].upper() + module[1:])
+            if is_array:
+                type_name = 'Array<{}>'.format(type_name)
+            return a | { k: type_name }
 
         return a | { k: convert_type(field_type) }
     return reduce(reducer, fields.items(), {})

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
 @dataclass
-class CodegenConfig(object):
+class CodegenSchema(object):
     boilerplate_repo_url:str
     rules:dict

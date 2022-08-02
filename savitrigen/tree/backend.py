@@ -1,6 +1,6 @@
 from savitrigen import __version__
 from savitrigen.tree import TreeClass
-from savitrigen.schema import BackendConfig
+from savitrigen.schema import BackendSchema
 from savitrigen.util import map_fields, make_ts_typehints, extract_collections
 from savitrigen.template.backend import (
     ControllerTemplate,
@@ -15,10 +15,10 @@ from savitrigen.template.backend import (
 
 @TreeClass('backend')
 class BackendTree():
-    def __init__(self, config:BackendConfig):
+    def __init__(self, schema:BackendSchema):
         super().__init__()
 
-        self._config = config
+        self._schema = schema
         self._unused_keys = [
             'translation',
             'documentation'
@@ -35,7 +35,7 @@ class BackendTree():
 
         self.write_file('index.ts', IndexTemplate, {
             'module_imports': self._multiline_replace(
-                self._config.plugins,
+                self._schema.plugins,
                 PluginImportTemplate,
                 lambda _ : {
                     'capitalized': self._capitalize(_.split('-')[-1]),
@@ -43,7 +43,7 @@ class BackendTree():
                 },
             ),
             'module_instances': self._multiline_replace(
-                self._config.plugins,
+                self._schema.plugins,
                 PluginInstanceTemplate,
                 lambda _ : {
                     'capitalized': ' '*4 + self._capitalize(_.split('-')[-1])
@@ -51,7 +51,7 @@ class BackendTree():
             )
         })
 
-        for k, v in self._config.collections.items():
+        for k, v in self._schema.collections.items():
             self.create_collection(k, v)
 
     def create_build_json(self):
@@ -91,6 +91,7 @@ class BackendTree():
             'documentation': documentation,
             'type_hints': make_ts_typehints(mapped_fields),
             'savitrigen_version': __version__,
+            'copyright': self._schema.meta.owner,
             **({
                 'document_imports': self._multiline_replace(
                     collections_names,

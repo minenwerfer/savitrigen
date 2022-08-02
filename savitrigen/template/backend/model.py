@@ -1,13 +1,14 @@
 from string import Template
 
 ModelTemplate = Template(
-r"""import { mongoose, options, descriptionToSchema } from '@savitri/backend'
+r"""import { MongoDocument } from '@savitri/api/types'
+import { mongoose, options, descriptionToSchema } from '@savitri/backend'
 import { default as Description } from './index.json'
 
 ${document_imports}
 ${reference_imports}
 
-export interface ${pascal_case}Document extends mongoose.Document {
+export interface ${pascal_case}Document extends MongoDocument {
 ${type_hints}
 }
 

@@ -57,7 +57,8 @@ class Field(object):
 
 
 @dataclass
-class BackendConfig(object):
+class BackendSchema(object):
+    meta:dict
     collections:dict
     _collections:dict = field(init=False, repr=False)
 

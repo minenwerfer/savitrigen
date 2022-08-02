@@ -9,37 +9,38 @@ from savitrigen.bootstrap import Bootstrap
 from savitrigen.cache import Cache
 from savitrigen.source import Source
 from savitrigen.schema import (
-    CodegenConfig,
-    ProjectConfig,
-    BackendConfig,
-    FrontendConfig
+    CodegenSchema,
+    ProjectSchema,
+    BackendSchema,
+    FrontendSchema
 )
 
 def main():
     """Main code generation routine"""
     with open('{}/{}'.format(CONFIG_PATH, 'config.yml'), 'r') as f:
-        codegen_config = CodegenConfig(**yaml.safe_load(f))
+        codegen_schema = CodegenSchema(**yaml.safe_load(f))
 
     with open('savitrigen.yml', 'r') as f:
-        project_config = ProjectConfig(**yaml.safe_load(f))
-        backend_config = BackendConfig(
-            **project_config.backend,
-            plugins=project_config.plugins
+        project_schema = ProjectSchema(**yaml.safe_load(f))
+        backend_schema = BackendSchema(
+            **project_schema.backend,
+            meta=project_schema.meta,
+            plugins=project_schema.plugins
         )
 
-        frontend_config = FrontendConfig(
-            **project_config.frontend,
-            meta=project_config.meta,
-            collections=backend_config.collections,
-            plugins=project_config.plugins
+        frontend_schema = FrontendSchema(
+            **project_schema.frontend,
+            meta=project_schema.meta,
+            collections=backend_schema.collections,
+            plugins=project_schema.plugins
         )
 
-    Bootstrap.clone_repo(codegen_config)
+    Bootstrap.clone_repo(codegen_schema)
 
     project_tree, backend_tree, frontend_tree = (
-        ProjectTree(project_config),
-        BackendTree(backend_config),
-        FrontendTree(frontend_config)
+        ProjectTree(project_schema),
+        BackendTree(backend_schema),
+        FrontendTree(frontend_schema)
     )
 
     Source().create([project_tree, backend_tree, frontend_tree])

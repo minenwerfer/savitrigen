@@ -38,7 +38,7 @@ ${locale_imports}
 ${menu_entries}
       ]
     },
-    'Configuração': {
+    'Schemauração': {
       children: [
         'dashboard-accessProfile',
         'dashboard-user',

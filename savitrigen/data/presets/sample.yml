@@ -1,6 +1,7 @@
 meta:
   version: 1.0
   alias: project_name
+  owner: Capsul Brasil
   product:
     name: Pizzaria Savitri
     group: Protolab

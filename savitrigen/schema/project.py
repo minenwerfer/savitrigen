@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from .backend import BackendConfig
-from .frontend import FrontendConfig
+from .backend import BackendSchema
+from .frontend import FrontendSchema
 
 from savitrigen.guideline import check_plugin_naming
 
@@ -13,6 +13,7 @@ class Product(object):
 class Meta(object):
     version:str
     alias:str
+    owner:str
     product:Product
     _product:Product = field(init=False, repr=False)
 
@@ -26,14 +27,14 @@ class Meta(object):
 
 
 @dataclass
-class ProjectConfig(object):
+class ProjectSchema(object):
     meta:dict
     _meta:dict = field(init=False, repr=False)
     plugins:list[str]
     _plugins:list[str] = field(init=False, repr=False)
 
-    backend:BackendConfig = None
-    frontend:FrontendConfig = None
+    backend:BackendSchema = None
+    frontend:FrontendSchema = None
 
     @property
     def meta(self) -> Meta:
