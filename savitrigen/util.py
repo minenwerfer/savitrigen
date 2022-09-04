@@ -14,7 +14,7 @@ ts_type_mapping = {
         'integer'
     ],
     'ObjectId': [
-        'module',
+        'collection',
         'objectid'
     ],
     'boolean': 'boolean',
@@ -29,8 +29,8 @@ def extract_collection(field:dict) -> str:
 
     is_array = field.get('array', False)
 
-    if module := field.get('module'):
-        return module, is_array
+    if collection := field.get('collection'):
+        return collection, is_array
 
     if values := field.get('values'):
         if query := extract_query(
@@ -39,7 +39,7 @@ def extract_collection(field:dict) -> str:
             else field['values'][0]
         ):
             return (
-                query['module'],
+                query['collection'],
                 is_array or isinstance(field['values'], list)
             )
 
@@ -68,8 +68,8 @@ def map_fields(fields:dict) -> dict:
 
         _tuple = extract_collection(v)
         if _tuple:
-            module, is_array = _tuple
-            type_name = '{}Document'.format(module[0].upper() + module[1:])
+            collection, is_array = _tuple
+            type_name = '{}Document'.format(collection[0].upper() + collection[1:])
             if is_array:
                 type_name = 'Array<{}>'.format(type_name)
             return a | { k: type_name }

@@ -6,7 +6,7 @@ meta:
     name: IPTV
     group: Protolab
 
-backend:
+api:
   collections:
     contract:
       unicon: file-alt
@@ -20,21 +20,21 @@ backend:
           type: datetime
         customer:
           label: Cliente
-          module: customer
+          collection: customer
           index: document
         service:
           label: Serviço
           type: select
           values:
             - __query:
-                module: service
+                collection: service
                 index: name
         hosting:
           label: Hospedagem
           type: select
           values:
             - __query:
-                module: hosting
+                collection: hosting
                 index: name
 
     customer:
@@ -84,6 +84,6 @@ backend:
           label: URL
           type: text
 
-frontend:
+web:
   has_releases: true
   default_locale: pt_BR

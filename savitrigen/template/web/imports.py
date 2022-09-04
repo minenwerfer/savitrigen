@@ -1,7 +1,7 @@
 from string import Template
 
 PluginImportTemplate = Template(
-r"""import { frontend as ${capitalized}Module } from '$plugin_name'"""
+r"""import { web as ${capitalized}Module } from '$plugin_name'"""
 )
 
 PluginInstanceTemplate = Template(

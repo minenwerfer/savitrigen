@@ -2,7 +2,7 @@ from string import Template
 
 ModelTemplate = Template(
 r"""import { MongoDocument } from '@savitri/api/types'
-import { mongoose, options, descriptionToSchema } from '@savitri/backend'
+import { mongoose, options, descriptionToSchema } from '@savitri/api'
 import { default as Description } from './index.json'
 
 ${document_imports}

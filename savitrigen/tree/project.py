@@ -13,8 +13,8 @@ class ProjectTree():
     def create_package_json(self):
         dependencies = [
             '@savitri/common',
-            '@savitri/backend',
-            '@savitri/frontend',
+            '@savitri/api',
+            '@savitri/web',
             '@savitri/components',
             '@savitri/i18n-ptbr'
         ]

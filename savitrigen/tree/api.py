@@ -1,8 +1,8 @@
 from savitrigen import __version__
 from savitrigen.tree import TreeClass
-from savitrigen.schema import BackendSchema
+from savitrigen.schema import ApiSchema
 from savitrigen.util import map_fields, make_ts_typehints, extract_collections
-from savitrigen.template.backend import (
+from savitrigen.template.api import (
     ControllerTemplate,
     ModelTemplate,
     DocumentImportTemplate,
@@ -13,9 +13,9 @@ from savitrigen.template.backend import (
     PluginInstanceTemplate
 )
 
-@TreeClass('backend')
-class BackendTree():
-    def __init__(self, schema:BackendSchema):
+@TreeClass('api')
+class ApiTree():
+    def __init__(self, schema:ApiSchema):
         super().__init__()
 
         self._schema = schema

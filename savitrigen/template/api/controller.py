@@ -1,7 +1,7 @@
 from string import Template
 
 ControllerTemplate = Template(
-r"""import { Mutable } from '@savitri/backend'
+r"""import { Mutable } from '@savitri/api'
 import { ${pascal_case}Document, ${pascal_case} } from './${camel_case}.model'
 import { default as Description } from './index.json'
 

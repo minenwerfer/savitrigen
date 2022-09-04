@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from .backend import BackendSchema
-from .frontend import FrontendSchema
+from .api import ApiSchema
+from .web import WebSchema
 
 from savitrigen.guideline import check_plugin_naming
 
@@ -33,8 +33,8 @@ class ProjectSchema(object):
     plugins:list[str]
     _plugins:list[str] = field(init=False, repr=False)
 
-    backend:BackendSchema = None
-    frontend:FrontendSchema = None
+    api:ApiSchema = None
+    web:WebSchema = None
 
     @property
     def meta(self) -> Meta:

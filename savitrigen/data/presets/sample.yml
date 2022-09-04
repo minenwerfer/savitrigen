@@ -10,7 +10,7 @@ plugins:
   - '@savitri/plugin-referral'
   - '@savitri/plugin-videoroom'
 
-backend:
+api:
   collections:
     pizza:
       documentation: |
@@ -34,7 +34,7 @@ backend:
           required: true
           values:
             - __query:
-                module: ingredient
+                collection: ingredient
                 index:
                   - name
                   - price
@@ -60,6 +60,18 @@ backend:
           description: Usando pizza gigante como referência
           type: number
 
-frontend:
+web:
   has_releases: true
   default_locale: pt_BR
+
+  menu_schema:
+    Início:
+      children:
+        - dashboard-pizza
+        - dashboard-ingredient
+    Administração:
+      roles:
+        - root
+      children:
+        - dashboard-user
+        - dashboard-accessProfile

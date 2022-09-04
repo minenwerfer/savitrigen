@@ -6,29 +6,23 @@ r"""<template>
 </template>
 
 <script setup lang="ts">
-import {
-  toRefs
-} from 'vue'
+import { useStore } from '@savitri/web'
 
-import { useStore } from 'vuex'
-import { useModule } from '@savitri/frontend'
-
-const store = useStore()
-const moduleRefs = reactive(useModule('${name}', store))
-
-const {
-  item,
-  items
-
-} = toRefs(moduleRefs)
+const store = useStore('${name}')
 </script>
 """)
 
-InternalHomeComponentTemplate = Template(
+DashboardHomeComponentTemplate = Template(
 r"""<template>
-  <sv-prose class="mt-4">
+  <sv-prose class="tw-mt-4">
     <template #title>Parabéns</template>
-    <ul class="flex flex-col gap-y-3 list-disc pl-4">
+    <ul class="
+        tw-flex
+        tw-flex-col
+        tw-gap-y-3
+        tw-list-disc
+        tw-pl-4
+    ">
       <li
         v-for="(item, index) in items"
         v-html="item"

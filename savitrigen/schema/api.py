@@ -7,11 +7,12 @@ from savitrigen.guideline import (
 
 @dataclass
 class Collection(object):
-    module:str
+    collection:str
     fields:dict
     _fields:dict = field(init=False, repr=False)
 
     unicon:str = ''
+    strict:bool = False
     route:bool = False
     report:bool = False
     presets:list[str] = None
@@ -52,12 +53,12 @@ class Field(object):
     mask:str = None
 
     """Collection specific properties"""
-    module:str = None
+    collection:str = None
     index:typing.Union[str,list[str]] = None
 
 
 @dataclass
-class BackendSchema(object):
+class ApiSchema(object):
     meta:dict
     collections:dict
     _collections:dict = field(init=False, repr=False)
@@ -73,7 +74,7 @@ class BackendSchema(object):
         ms = dict()
 
         for k, v in value.items():
-            ms[k] = collection = Collection(**(v | dict(module=k)))
+            ms[k] = collection = Collection(**(v | dict(collection=k)))
             check_collection_naming(k)
 
             for f_k, f_v in collection.fields.items():

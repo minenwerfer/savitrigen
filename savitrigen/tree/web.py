@@ -2,28 +2,27 @@ import json
 from contextlib import suppress
 from string import Template
 from savitrigen.tree import TreeClass
-from savitrigen.schema import FrontendSchema
-from savitrigen.template.frontend import (
+from savitrigen.schema import WebSchema
+from savitrigen.template.web import (
     IndexTemplate,
     ModuleIndexTemplate,
     RouterTemplate,
-    StoreTemplate,
     PluginImportTemplate,
     PluginInstanceTemplate,
     LocaleImportTemplate,
-    InternalRouterTemplate,
-    InternalHomeComponentTemplate
+    DashboardRouterTemplate,
+    DashboardHomeComponentTemplate
 )
 
-@TreeClass('frontend')
-class FrontendTree():
-    def __init__(self, schema:FrontendSchema):
+@TreeClass('web')
+class WebTree():
+    def __init__(self, schema:WebSchema):
         super().__init__()
         self._schema = schema
 
     def create(self):
         self.create_build_json()
-        self.create_module('internal', router_tpl=InternalRouterTemplate)
+        self.create_module('dashboard', router_tpl=DashboardRouterTemplate)
 
         translation_table = {}
         for collection_name, collection in [(k, v) for k, v in self._schema.collections.items() if v.translation]:
@@ -61,22 +60,14 @@ class FrontendTree():
                     'locale': _
                 }
             ),
-            'menu_entries': self._multiline_replace(
-                self._schema.collections.keys(),
-                Template(' '*8 + "'dashboard-${collection_name}',"),
-                lambda _ : {
-                    'collection_name': _
-                }
-            )
+            'menu_schema': self._json_dumps(self._schema.menu_schema)
         })
 
         for locale, table in translation_table.items():
             self.update_i18n(locale, table)
 
-        with self.change_dir('modules/internal'):
-            self.make_dir('components/dashboard/c-home')
-            self.write_file('components/dashboard/c-home/c-home.vue', InternalHomeComponentTemplate, {})
-
+        with self.change_dir('modules/dashboard'):
+            self.write_file('views/home.vue', DashboardHomeComponentTemplate, {})
 
     def create_build_json(self):
         content = self._json_dumps({
@@ -98,13 +89,12 @@ class FrontendTree():
     def create_module(self, name:str, router_tpl=None):
         path = self.make_dir('modules/{}'.format(name))
 
-        store_path = self.make_dir('modules/{}/store'.format(name))
-        components_path = self.make_dir('modules/{}/components'.format(name))
+        store_path = self.make_dir('modules/{}/stores'.format(name))
+        components_path = self.make_dir('modules/{}/views'.format(name))
 
         with self.change_dir(path):
             self.write_file('index.ts', ModuleIndexTemplate, {})
             self.write_file('router.ts', router_tpl or RouterTemplate, {})
-            self.write_file('store/index.ts', StoreTemplate, {})
 
     def update_i18n(self, locale:str, new_table):
         path = self.make_dir('i18n/{}'.format(locale))

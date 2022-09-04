@@ -10,12 +10,12 @@ r"import '../${camel_case}/${camel_case}.model'"
 )
 
 CommonDocumentImportTemplate = Template(
-r"import { ${pascal_case}Document } from '@savitri/backend/collections'"
+r"import { ${pascal_case}Document } from '@savitri/api/collections'"
 )
 
 """Used in index"""
 PluginImportTemplate = Template(
-r"import { backend as ${capitalized}Module } from '$plugin_collection'"
+r"import { api as ${capitalized}Module } from '$plugin_collection'"
 )
 
 PluginInstanceTemplate = Template(

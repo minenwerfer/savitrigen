@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 
 @dataclass
-class FrontendSchema(object):
+class WebSchema(object):
     meta:dict
     collections:list[str]
     default_locale:str
+
+    menu_schema:dict
 
     plugins:list[str] = None
 
