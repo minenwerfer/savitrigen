@@ -1,6 +1,6 @@
 from savitrigen import __version__
 from savitrigen.tree import TreeClass
-from savitrigen.schema import ApiSchema
+from savitrigen.schema import dataclass_to_dict, ApiSchema
 from savitrigen.util import map_fields, make_ts_typehints, extract_collections
 from savitrigen.template.api import (
     ControllerTemplate,
@@ -33,7 +33,12 @@ class ApiTree():
         if not self.on_cache:
             self.copy_file('sample.env', '.env')
 
+        provide = self._json_dumps({
+            'apiConfig': dataclass_to_dict(self._schema.config)
+        })
+
         self.write_file('index.ts', IndexTemplate, {
+            'provide': provide,
             'module_imports': self._multiline_replace(
                 self._schema.plugins,
                 PluginImportTemplate,
@@ -46,7 +51,7 @@ class ApiTree():
                 self._schema.plugins,
                 PluginInstanceTemplate,
                 lambda _ : {
-                    'capitalized': ' '*4 + self._capitalize(_.split('-')[-1])
+                    'capitalized': ' '*2 + self._capitalize(_.split('-')[-1])
                 }
             )
         })
@@ -70,9 +75,7 @@ class ApiTree():
         """
         path = self.make_dir('collections/{}'.format(name))
 
-        description = dict() | _description.__dict__
-        description['fields'] = description.pop('_fields')
-
+        description = dataclass_to_dict(_description)
         documentation = description.get('documentation').strip()
 
         fields = _description.fields
@@ -85,13 +88,16 @@ class ApiTree():
             if k in description:
                 del description[k]
 
-        params = {
+        common_params = {
             'pascal_case': self._pascal_case(name),
             'camel_case': self._camel_case(name),
             'documentation': documentation,
-            'type_hints': make_ts_typehints(mapped_fields),
             'savitrigen_version': __version__,
-            'copyright': self._schema.meta.owner,
+            'copyright': self._schema.meta.owner
+        }
+
+        model_params = common_params | {
+            'type_hints': make_ts_typehints(mapped_fields),
             **({
                 'document_imports': self._multiline_replace(
                     collections_names,
@@ -116,13 +122,19 @@ class ApiTree():
             } if len(collections) > 0 else {})
         }
 
+        controller_params = common_params | {}
+
+        from icecream import ic
+        ic(description)
+
         with self.change_dir(path):
             self.write_file('index.json', self._json_dumps(description))
-            self.write_file('{}.controller.ts'.format(name), ControllerTemplate, params)
+            self.write_file('{}.controller.ts'.format(name), ControllerTemplate, controller_params)
 
-            self.write_file('{}.model.ts'.format(name), ModelTemplate, {
-                'document_imports': '// no document imports',
-                'reference_imports': '// no reference imports',
-            }, params)
+            if not description.get('alias'):
+                self.write_file('{}.model.ts'.format(name), ModelTemplate, {
+                    'document_imports': '// no document imports',
+                    'reference_imports': '// no reference imports',
+                }, model_params)
 
 

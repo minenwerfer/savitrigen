@@ -5,13 +5,13 @@ r"""import { init } from '@savitri/api/server'
 
 ${module_imports}
 
-const config = {
-  modules: [
-${module_instances}
-  ]
-}
+const provide = ${provide}
 
-init(config)
+const modules = [
+${module_instances}
+]
+
+init({ provide, modules })
     .then(server => server.start())
 """
 )

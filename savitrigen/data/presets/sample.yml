@@ -6,11 +6,29 @@ meta:
     name: Pizzaria Savitri
     group: Protolab
 
-plugins:
-  - '@savitri/plugin-referral'
-  - '@savitri/plugin-videoroom'
+web:
+  has_releases: true
+  default_locale: pt_BR
+
+  menu_schema:
+    Início:
+      children:
+        - dashboard-pizza
+        - dashboard-ingredient
+    Administração:
+      roles:
+        - root
+      children:
+        - dashboard-user
+        - dashboard-accessProfile
 
 api:
+  config:
+    roles:
+      - root
+      - gerente
+      - usuario
+
   collections:
     pizza:
       documentation: |
@@ -59,19 +77,3 @@ api:
           label: Custo de fabricação
           description: Usando pizza gigante como referência
           type: number
-
-web:
-  has_releases: true
-  default_locale: pt_BR
-
-  menu_schema:
-    Início:
-      children:
-        - dashboard-pizza
-        - dashboard-ingredient
-    Administração:
-      roles:
-        - root
-      children:
-        - dashboard-user
-        - dashboard-accessProfile

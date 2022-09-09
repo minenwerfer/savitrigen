@@ -11,15 +11,20 @@ SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 def make_userdir():
     config_path = Path(CONFIG_PATH)
 
-    if config_path.exists():
-        return
+    if not config_path.exists():
+        config_path.mkdir()
+        shutil.copytree(
+            os.path.join(SCRIPT_PATH, 'data'),
+            CONFIG_PATH,
+            dirs_exist_ok=True
+        )
 
-    config_path.mkdir(exist_ok=True)
     shutil.copytree(
-        os.path.join(SCRIPT_PATH, 'data'),
-        CONFIG_PATH,
+        os.path.join(SCRIPT_PATH, 'data/presets'),
+        os.path.join(CONFIG_PATH, 'presets'),
         dirs_exist_ok=True
     )
+
 
 def copy_from_userdir(fname:str, dest:str, exist_ok:bool=False):
     if not exist_ok and Path(dest).exists():

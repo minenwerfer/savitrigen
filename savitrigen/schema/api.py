@@ -5,13 +5,43 @@ from savitrigen.guideline import (
     check_field_naming
 )
 
+from .util import dataclass_to_dict, snake_to_camel
+
+@dataclass
+class ApiConfig(object):
+    roles: list[str]
+
+@dataclass
+class QueryPreset(object):
+    filters:dict = None
+    sort:dict = None
+
+@dataclass
+class ControllerOptions(object):
+    query_preset:QueryPreset
+    _query_preset:QueryPreset = field(init=False, repr=False)
+
+    @property
+    def query_preset(self) -> QueryPreset:
+        return self._query_preset
+
+    @query_preset.setter
+    def query_preset(self, value:dict) -> None:
+        self._query_preset = QueryPreset(**value) \
+            if value else None
+
+
 @dataclass
 class Collection(object):
     collection:str
     fields:dict
-    _fields:dict = field(init=False, repr=False)
+    options:ControllerOptions
 
-    unicon:str = ''
+    _fields:dict = field(init=False, repr=False)
+    _options:ControllerOptions = field(init=False, repr=False)
+
+    alias:str = None
+    unicon:str = None
     strict:bool = False
     route:bool = False
     report:bool = False
@@ -39,6 +69,23 @@ class Collection(object):
     def fields(self, value:dict) -> None:
         self._fields = value
 
+    @property
+    def options(self) -> ControllerOptions:
+        return self._options
+
+    @options.setter
+    def options(self, _value:dict) -> None:
+        value = _value | {
+            'query_preset': _value.get('query_preset')
+        }
+
+        value = ControllerOptions(**value)
+        self._options = {
+            snake_to_camel(k): v
+            for k, v in dataclass_to_dict(value).items()
+        }
+
+
 @dataclass
 class Field(object):
     label:str
@@ -60,10 +107,21 @@ class Field(object):
 @dataclass
 class ApiSchema(object):
     meta:dict
+    config:dict
     collections:dict
+
+    _config:dict = field(init=False, repr=False)
     _collections:dict = field(init=False, repr=False)
 
     plugins:list[str] = None
+
+    @property
+    def config(self) -> dict:
+        return self._config
+
+    @config.setter
+    def config(self, value:dict) -> None:
+        self._config = ApiConfig(**value)
 
     @property
     def collections(self) -> dict:
@@ -74,7 +132,13 @@ class ApiSchema(object):
         ms = dict()
 
         for k, v in value.items():
-            ms[k] = collection = Collection(**(v | dict(collection=k)))
+            collection = v | {
+                'collection': k,
+                'options': v.get('options', {}),
+                'fields': v.get('fields', {})
+            }
+
+            ms[k] = collection = Collection(**collection)
             check_collection_naming(k)
 
             for f_k, f_v in collection.fields.items():
