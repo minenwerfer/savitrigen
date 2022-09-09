@@ -89,14 +89,14 @@ class ApiTree():
                 del description[k]
 
         common_params = {
-            'pascal_case': self._pascal_case(name),
-            'camel_case': self._camel_case(name),
             'documentation': documentation,
             'savitrigen_version': __version__,
             'copyright': self._schema.meta.owner
         }
 
         model_params = common_params | {
+            'camel_case': self._camel_case(name),
+            'pascal_case': self._pascal_case(name),
             'type_hints': make_ts_typehints(mapped_fields),
             **({
                 'document_imports': self._multiline_replace(
@@ -122,10 +122,13 @@ class ApiTree():
             } if len(collections) > 0 else {})
         }
 
-        controller_params = common_params | {}
-
-        from icecream import ic
-        ic(description)
+        controller_params = common_params | {
+            'model_pascal_case': self._pascal_case(description.get('alias', name)),
+            'pascal_case': self._pascal_case(name),
+            'model_path': (lambda _ : '../{}/{}.model'.format(_, _))(self._camel_case(description['alias'])) \
+                if description.get('alias') \
+                else './{}.model'.format(self._camel_case(name))
+        }
 
         with self.change_dir(path):
             self.write_file('index.json', self._json_dumps(description))

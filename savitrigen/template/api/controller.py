@@ -2,7 +2,7 @@ from string import Template
 
 ControllerTemplate = Template(
 r"""import { Mutable } from '@savitri/api'
-import { ${pascal_case}Document, ${pascal_case} } from './${camel_case}.model'
+import { ${model_pascal_case}Document, ${model_pascal_case} } from './${model_path}'
 import { default as Description } from './index.json'
 
 /**
@@ -11,9 +11,9 @@ import { default as Description } from './index.json'
     ${documentation}
 */
 
-export class ${pascal_case}Controller extends Mutable<${pascal_case}Document> {
+export class ${pascal_case}Controller extends Mutable<${model_pascal_case}Document> {
   constructor() {
-    super(${pascal_case}, Description)
+    super(${model_pascal_case}, Description)
   }
 }
 """)
