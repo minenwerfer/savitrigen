@@ -34,7 +34,7 @@ class ApiTree():
             self.copy_file('sample.env', '.env')
 
         provide = self._json_dumps({
-            'apiConfig': dataclass_to_dict(self._schema.config)
+            'apiConfig': dataclass_to_dict(self._schema.config, convert_casing=True)
         })
 
         self.write_file('index.ts', IndexTemplate, {
@@ -75,13 +75,13 @@ class ApiTree():
         """
         path = self.make_dir('collections/{}'.format(name))
 
-        description = dataclass_to_dict(_description)
+        description = dataclass_to_dict(_description, convert_casing=True)
         documentation = description.get('documentation').strip()
 
         fields = _description.fields
-        mapped_fields = map_fields(fields)
+        mapped_fields = map_fields(fields) if fields else {}
 
-        collections = list(extract_collections(fields))
+        collections = list(extract_collections(fields)) if fields else {}
         collections_names = [ collection[0] for collection in collections ]
 
         for k in self._unused_keys:
@@ -131,7 +131,7 @@ class ApiTree():
         }
 
         with self.change_dir(path):
-            self.write_file('index.json', self._json_dumps(description))
+            self.write_file('index.json', self._json_dumps(description), patch=False)
             self.write_file('{}.controller.ts'.format(name), ControllerTemplate, controller_params)
 
             if not description.get('alias'):

@@ -3,7 +3,7 @@ from functools import reduce
 ts_type_mapping = {
     'string': [
         'text',
-        'textarea',
+        'textbox',
         'string',
         'select',
         'checkbox',
@@ -44,9 +44,11 @@ def extract_collection(field:dict) -> str:
             )
 
 def extract_collections(fields:dict) -> str:
+    collections = []
     for k, v in fields.items():
         _tuple = extract_collection(v)
-        if _tuple:
+        if _tuple and _tuple[0] not in collections:
+            collections += [_tuple[0]]
             yield _tuple
 
 def convert_type(name:str) -> dict:

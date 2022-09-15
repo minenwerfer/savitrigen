@@ -46,10 +46,15 @@ class PathlibWrapper(object):
         path = self._get_path(file)
         return path.read_text()
 
-    def _write_file(self, file:typing.Union[pathlib.PosixPath, str], content:str, patch=True) -> pathlib.Path:
+    def _write_file(
+        self,
+        file:typing.Union[pathlib.PosixPath, str],
+        content:str,
+        patch=True
+    ) -> pathlib.Path:
         path = self._get_path(file)
 
-        if not self.on_cache and path.exists():
+        if patch and not self.on_cache and path.exists():
             cached_path = str(path).replace('source/', '.savitricache/', 1)
             cached_path = pathlib.Path(cached_path)
 

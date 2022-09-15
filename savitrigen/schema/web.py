@@ -1,4 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+@dataclass
+class WebConfig(object):
+    signup_form:bool = None
+    releases:bool = None
+    feedback:bool = None
 
 @dataclass
 class WebSchema(object):
@@ -7,12 +13,16 @@ class WebSchema(object):
     default_locale:str
 
     menu_schema:dict
+    config:WebConfig
+    _config:dict = field(init=False, repr=False)
 
     plugins:list[str] = None
 
-    notice:str = None
-    signin_text:str = None
 
-    has_releases:bool = False
-    has_feedback:bool = False
-    has_notification:bool = False
+    @property
+    def config(self) -> dict:
+        return self._config
+
+    @config.setter
+    def config(self, value:dict) -> None:
+        self._config = WebConfig(**value)

@@ -2,7 +2,7 @@ import json
 from contextlib import suppress
 from string import Template
 from savitrigen.tree import TreeClass
-from savitrigen.schema import WebSchema
+from savitrigen.schema import WebSchema, dataclass_to_dict
 from savitrigen.template.web import (
     IndexTemplate,
     ModuleIndexTemplate,
@@ -70,17 +70,17 @@ class WebTree():
             self.write_file('views/home.vue', DashboardHomeComponentTemplate, {})
 
     def create_build_json(self):
+        config = {
+            'productName': self._schema.meta.product.name,
+            'productLogo': 'logo.png',
+            'productLogoAlt': 'logo-alt.png',
+            **dataclass_to_dict(self._schema.config, convert_casing=True)
+        }
+
         content = self._json_dumps({
             'name': '',
             'externals': {
-                'variables': {
-                    'productName': self._schema.meta.product.name,
-                    'productLogo': 'logo.png',
-                    'productLogoAlt': 'logo-alt.png',
-                    'releases': self._schema.has_releases,
-                    'notification': self._schema.has_notification,
-                    'feedback': self._schema.has_feedback,
-                }
+                'variables': config
             }
         })
 

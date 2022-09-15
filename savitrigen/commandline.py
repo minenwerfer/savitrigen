@@ -43,8 +43,14 @@ def main():
         WebTree(web_schema)
     )
 
-    Source().create([project_tree, api_tree, web_tree])
-    Cache().create([project_tree, api_tree, web_tree])
+    trees = [
+        project_tree,
+        api_tree,
+        web_tree
+    ]
+
+    Source().create(trees)
+    Cache().create(trees)
 
     Bootstrap.install()
 

@@ -10,7 +10,7 @@ r"import '../${camel_case}/${camel_case}.model'"
 )
 
 CommonDocumentImportTemplate = Template(
-r"import { ${pascal_case}Document } from '@savitri/api/collections'"
+r"import { ${pascal_case}Document } from '@savitri/collections/${camel_case}/${camel_case}.model'"
 )
 
 """Used in index"""
