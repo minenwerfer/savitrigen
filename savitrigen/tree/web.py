@@ -106,4 +106,4 @@ class WebTree():
                 table = json.loads(index_content)
 
             table |= new_table
-            self.write_file('index.json', self._json_dumps(table))
+            self.write_file('index.json', self._json_dumps(table), patch=False)

@@ -8,12 +8,35 @@ from savitrigen.guideline import (
 from .util import dataclass_to_dict, snake_to_camel
 
 @dataclass
+class Roles(object):
+    grant_everything:bool = None
+    methods:list[str] = None
+
+@dataclass
 class ApiConfig(object):
     group:str = None
-    roles:list[str] = None
+    roles:dict = None
     allow_signup:list[str] = None
     signup_defaults:dict = None
     populate_user_extra:list[str] = None
+
+    @property
+    def roles(self) -> dict:
+        return {
+            k: dataclass_to_dict(v, convert_casing=True)
+            for k, v in self._roles.items()
+        }
+
+    @roles.setter
+    def roles(self, value:dict) -> None:
+        if not value:
+            self._roles = None
+            return
+
+        self._roles = {
+            k: Roles(**v)
+            for k, v in value.items()
+        }
 
 @dataclass
 class QueryPreset(object):
@@ -58,6 +81,8 @@ class Collection(object):
 
     form:list[str] = None
     table:list[str] = None
+    filters:list[str] = None
+    writable:list[str] = None
     form_layout:dict = None
 
     alias:str = None
@@ -124,7 +149,7 @@ class Collection(object):
             return
 
         self._actions = {
-            k: CollectionAction(v)
+            k: CollectionAction(**v) if v else None
             for k, v in value.items()
         }
 
@@ -145,7 +170,7 @@ class Collection(object):
             return
 
         self._individual_actions = {
-            k: CollectionAction(**v)
+            k: CollectionAction(**v) if v else None
             for k, v in value.items()
         }
 
@@ -154,15 +179,20 @@ class Collection(object):
 class Field(object):
     label:str
     type:str = None
+    default:str = None
 
     description:str = None
 
     required:bool = False
-    readonly:bool = False
+    readOnly:bool = False
     array:bool = False
     expand:bool = False
     values:list = None
     mask:str = None
+
+    noform:bool = None
+    notable:bool = None
+    meta:bool = None
 
     """Collection specific properties"""
     collection:str = None

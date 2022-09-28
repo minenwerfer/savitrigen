@@ -2,7 +2,7 @@ from string import Template
 
 ControllerTemplate = Template(
 r"""import { Mutable } from '@savitri/api'
-import { ${model_pascal_case}Document, ${model_pascal_case} } from './${model_path}'
+import { ${model_pascal_case}Document, ${model_pascal_case} } from '${model_path}'
 import { default as Description } from './index.json'
 
 /**
